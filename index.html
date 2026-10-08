@@ -1,0 +1,269 @@
+<!doctype html>
+<html lang="zh-CN">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <meta name="description" content="Ray 的个人主页——大厂产品经理、美区 ITIN 云居民，分享港卡、美卡与出海基建。">
+  <meta name="theme-color" content="#07090d">
+  <title>Ray · 云居民实验室</title>
+  <link rel="icon" type="image/svg+xml" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 64 64'%3E%3Crect width='64' height='64' rx='14' fill='%2307090d'/%3E%3Cpath d='M17 45V19h14c10 0 16 5 16 13 0 5-3 9-8 11l9 2v3H36l-9-13h6c4 0 6-1 6-4s-2-4-7-4h-6v18z' fill='%2374f7ff'/%3E%3C/svg%3E">
+  <style>
+    :root {
+      color-scheme: dark;
+      --bg: #07090d;
+      --panel: rgba(13, 18, 27, .72);
+      --text: #eef4ff;
+      --muted: #8390a6;
+      --line: rgba(137, 164, 205, .18);
+      --cyan: #74f7ff;
+      --violet: #886cff;
+      --glow: rgba(116, 247, 255, .24);
+    }
+
+    * { box-sizing: border-box; }
+    html { scroll-behavior: smooth; }
+    body {
+      margin: 0;
+      color: var(--text);
+      background:
+        linear-gradient(rgba(255,255,255,.025) 1px, transparent 1px),
+        linear-gradient(90deg, rgba(255,255,255,.025) 1px, transparent 1px),
+        radial-gradient(circle at var(--mx, 72%) var(--my, 14%), rgba(56, 125, 255, .16), transparent 30%),
+        var(--bg);
+      background-size: 52px 52px, 52px 52px, auto, auto;
+      font-family: ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, "Liberation Mono", monospace;
+      font-size: 16px;
+      line-height: 1.65;
+      overflow-x: hidden;
+    }
+    body::before {
+      content: "";
+      position: fixed;
+      inset: 0;
+      pointer-events: none;
+      background: linear-gradient(180deg, transparent 49%, rgba(116,247,255,.025) 50%);
+      background-size: 100% 4px;
+      mix-blend-mode: screen;
+      z-index: 30;
+    }
+    a { color: inherit; text-decoration: none; }
+    a:focus-visible { outline: 2px solid var(--cyan); outline-offset: 4px; }
+    .shell { width: min(1180px, calc(100% - 40px)); margin: 0 auto; }
+
+    .topbar {
+      height: 72px;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      border-bottom: 1px solid var(--line);
+      font-size: .78rem;
+      letter-spacing: .1em;
+      text-transform: uppercase;
+    }
+    .wordmark { display: flex; align-items: center; gap: 12px; font-weight: 800; }
+    .wordmark i { width: 10px; height: 10px; border: 2px solid var(--cyan); box-shadow: 0 0 16px var(--glow); transform: rotate(45deg); }
+    .topnav { display: flex; align-items: center; gap: 26px; color: var(--muted); }
+    .topnav a:hover { color: var(--cyan); }
+    .status { display: flex; align-items: center; gap: 9px; color: var(--cyan); }
+    .status::before { content: ""; width: 7px; height: 7px; border-radius: 50%; background: var(--cyan); box-shadow: 0 0 12px var(--cyan); }
+
+    .hero {
+      min-height: calc(100svh - 72px);
+      padding: 72px 0 64px;
+      display: grid;
+      grid-template-columns: minmax(0, 1.25fr) minmax(330px, .75fr);
+      gap: clamp(38px, 7vw, 92px);
+      align-items: center;
+    }
+    .system-label { color: var(--cyan); font-size: .78rem; letter-spacing: .18em; text-transform: uppercase; }
+    .system-label::before { content: "[ "; color: var(--muted); }
+    .system-label::after { content: " ]"; color: var(--muted); }
+    h1 {
+      margin: 28px 0 0;
+      max-width: 780px;
+      font-family: Inter, ui-sans-serif, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
+      font-size: clamp(4.7rem, 12vw, 10.8rem);
+      line-height: .78;
+      letter-spacing: -.085em;
+      font-weight: 800;
+    }
+    h1 span { color: transparent; -webkit-text-stroke: 1px rgba(238,244,255,.38); }
+    .role { margin: 34px 0 0; display: flex; flex-wrap: wrap; gap: 9px; }
+    .chip { padding: 7px 11px; border: 1px solid var(--line); background: rgba(7,9,13,.6); color: #a8b5ca; font-size: .75rem; }
+    .chip:first-child { color: var(--cyan); border-color: rgba(116,247,255,.35); }
+    .intro { max-width: 660px; margin: 28px 0 0; color: #abb7ca; font-family: Inter, ui-sans-serif, sans-serif; font-size: clamp(1rem, 1.7vw, 1.18rem); }
+    .hero-actions { margin-top: 34px; display: flex; flex-wrap: wrap; gap: 12px; }
+    .primary, .secondary {
+      min-height: 48px;
+      padding: 0 18px;
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      border: 1px solid var(--cyan);
+      font-size: .8rem;
+      font-weight: 800;
+      letter-spacing: .08em;
+      text-transform: uppercase;
+      transition: transform .2s ease, box-shadow .2s ease, background .2s ease;
+    }
+    .primary { color: #061013; background: var(--cyan); box-shadow: 0 0 28px rgba(116,247,255,.16); }
+    .secondary { color: var(--text); border-color: var(--line); background: rgba(255,255,255,.025); }
+    .primary:hover, .secondary:hover { transform: translateY(-3px); box-shadow: 0 10px 34px rgba(0,0,0,.34); }
+
+    .identity-card {
+      position: relative;
+      min-height: 520px;
+      border: 1px solid var(--line);
+      background: var(--panel);
+      backdrop-filter: blur(18px);
+      overflow: hidden;
+      box-shadow: 0 28px 90px rgba(0,0,0,.42);
+    }
+    .identity-card::before { content: ""; position: absolute; inset: 0; background: url("hero-abstract.png") center / cover no-repeat; opacity: .24; mix-blend-mode: screen; filter: saturate(.8) hue-rotate(120deg); }
+    .identity-card::after { content: ""; position: absolute; inset: 0; border: 1px solid transparent; background: linear-gradient(135deg, rgba(116,247,255,.6), transparent 34%, transparent 70%, rgba(136,108,255,.45)) border-box; -webkit-mask: linear-gradient(#fff 0 0) padding-box, linear-gradient(#fff 0 0); -webkit-mask-composite: xor; pointer-events: none; }
+    .card-ui { position: relative; z-index: 2; min-height: 520px; padding: 26px; display: flex; flex-direction: column; justify-content: space-between; }
+    .card-head, .card-foot { display: flex; justify-content: space-between; align-items: center; color: var(--muted); font-size: .72rem; letter-spacing: .1em; text-transform: uppercase; }
+    .avatar-wrap { width: 210px; height: 210px; margin: auto; position: relative; display: grid; place-items: center; }
+    .avatar-wrap::before, .avatar-wrap::after { content: ""; position: absolute; border-radius: 50%; border: 1px solid rgba(116,247,255,.42); }
+    .avatar-wrap::before { inset: -20px; animation: spin 12s linear infinite; border-top-color: transparent; border-bottom-color: var(--violet); }
+    .avatar-wrap::after { inset: -40px; border-color: rgba(136,108,255,.22); border-left-color: transparent; }
+    .avatar { width: 100%; height: 100%; object-fit: cover; border-radius: 50%; border: 3px solid rgba(238,244,255,.78); box-shadow: 0 0 55px rgba(116,247,255,.23); }
+    .handle { margin-top: 32px; text-align: center; font-size: 1.02rem; font-weight: 800; }
+    .handle small { display: block; margin-top: 4px; color: var(--cyan); font-weight: 500; font-size: .74rem; letter-spacing: .1em; }
+    @keyframes spin { to { transform: rotate(360deg); } }
+
+    .ticker { border-top: 1px solid var(--line); border-bottom: 1px solid var(--line); overflow: hidden; background: rgba(10,14,21,.74); }
+    .ticker-track { width: max-content; display: flex; gap: 34px; padding: 14px 0; color: #99a6bb; font-size: .76rem; letter-spacing: .13em; text-transform: uppercase; animation: ticker 28s linear infinite; }
+    .ticker-track b { color: var(--cyan); }
+    @keyframes ticker { to { transform: translateX(-50%); } }
+
+    section { padding: 108px 0; border-bottom: 1px solid var(--line); }
+    .section-head { display: grid; grid-template-columns: .7fr 2fr; gap: 34px; margin-bottom: 52px; }
+    .section-index { color: var(--cyan); font-size: .75rem; letter-spacing: .15em; }
+    h2 { margin: 0; max-width: 820px; font-family: Inter, ui-sans-serif, sans-serif; font-size: clamp(2.5rem, 6.2vw, 5.6rem); line-height: .96; letter-spacing: -.06em; }
+    h2 em { color: var(--cyan); font-style: normal; }
+
+    .link-grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 14px; }
+    .link-card { min-height: 290px; position: relative; padding: 24px; border: 1px solid var(--line); background: linear-gradient(145deg, rgba(18,25,37,.86), rgba(8,12,18,.62)); overflow: hidden; display: flex; flex-direction: column; justify-content: space-between; transition: transform .25s ease, border-color .25s ease, box-shadow .25s ease; }
+    .link-card::before { content: ""; position: absolute; left: 0; top: 0; width: 0; height: 2px; background: linear-gradient(90deg, var(--cyan), var(--violet)); transition: width .3s ease; }
+    .link-card:hover { transform: translateY(-7px); border-color: rgba(116,247,255,.4); box-shadow: 0 18px 60px rgba(0,0,0,.35); }
+    .link-card:hover::before { width: 100%; }
+    .link-meta { display: flex; justify-content: space-between; color: var(--muted); font-size: .7rem; letter-spacing: .1em; text-transform: uppercase; }
+    .link-card strong { max-width: 12ch; font-family: Inter, ui-sans-serif, sans-serif; font-size: clamp(1.55rem, 3vw, 2.2rem); line-height: 1.08; letter-spacing: -.035em; }
+    .link-card p { margin: 13px 0 0; color: var(--muted); font-size: .82rem; }
+    .launch { display: flex; justify-content: space-between; align-items: center; color: var(--cyan); font-size: .76rem; letter-spacing: .09em; text-transform: uppercase; }
+    .launch i { width: 26px; height: 1px; background: currentColor; box-shadow: 0 0 10px currentColor; }
+
+    .social-console { display: grid; grid-template-columns: 1.15fr .85fr; gap: 14px; }
+    .x-panel, .signal-panel { min-height: 330px; padding: 32px; border: 1px solid var(--line); background: var(--panel); }
+    .x-panel { display: flex; flex-direction: column; justify-content: space-between; }
+    .x-name { font-family: Inter, ui-sans-serif, sans-serif; font-size: clamp(3.6rem, 8vw, 7.4rem); font-weight: 800; letter-spacing: -.08em; line-height: .85; }
+    .x-name span { color: var(--cyan); }
+    .x-bottom { display: flex; justify-content: space-between; align-items: end; gap: 28px; }
+    .x-bottom p { margin: 0; max-width: 42ch; color: var(--muted); }
+    .signal-panel { position: relative; overflow: hidden; display: flex; flex-direction: column; justify-content: space-between; }
+    .signal-panel::before { content: ""; position: absolute; inset: 0; background: linear-gradient(90deg, transparent 49%, rgba(116,247,255,.07) 50%, transparent 51%); background-size: 18px 100%; }
+    .signal-ring { width: 150px; height: 150px; margin: auto; border: 1px solid var(--cyan); border-radius: 50%; display: grid; place-items: center; box-shadow: inset 0 0 35px rgba(116,247,255,.08), 0 0 35px rgba(116,247,255,.08); }
+    .signal-ring::before { content: "@"; font-family: Inter, sans-serif; font-size: 4.8rem; font-weight: 200; color: var(--cyan); text-shadow: 0 0 22px var(--glow); }
+    .signal-panel small { position: relative; z-index: 1; color: var(--muted); letter-spacing: .1em; text-transform: uppercase; }
+
+    footer { padding: 34px 0 44px; display: flex; justify-content: space-between; gap: 24px; color: var(--muted); font-size: .72rem; letter-spacing: .08em; text-transform: uppercase; }
+    .reveal { opacity: 0; transform: translateY(22px); transition: opacity .65s ease, transform .65s ease; }
+    .reveal.visible { opacity: 1; transform: none; }
+
+    @media (max-width: 860px) {
+      .shell { width: min(100% - 28px, 690px); }
+      .topbar { height: 64px; }
+      .topnav a { display: none; }
+      .hero { min-height: auto; grid-template-columns: 1fr; padding: 62px 0 74px; }
+      h1 { font-size: clamp(4.8rem, 26vw, 8rem); }
+      .identity-card, .card-ui { min-height: 460px; }
+      .section-head { grid-template-columns: 1fr; gap: 12px; margin-bottom: 38px; }
+      section { padding: 78px 0; }
+      .link-grid, .social-console { grid-template-columns: 1fr; }
+      .link-card { min-height: 230px; }
+      .x-panel, .signal-panel { min-height: 290px; }
+    }
+    @media (max-width: 540px) {
+      .topnav .status { display: flex; }
+      .hero-actions { flex-direction: column; }
+      .primary, .secondary { width: 100%; }
+      .x-bottom { flex-direction: column; align-items: stretch; }
+      footer { flex-direction: column; }
+    }
+    @media (prefers-reduced-motion: reduce) {
+      html { scroll-behavior: auto; }
+      *, *::before, *::after { animation-duration: .01ms !important; transition-duration: .01ms !important; }
+      .reveal { opacity: 1; transform: none; }
+    }
+  </style>
+</head>
+<body>
+  <header class="shell">
+    <nav class="topbar" aria-label="主导航">
+      <a class="wordmark" href="#top"><i aria-hidden="true"></i> Ray.OS</a>
+      <div class="topnav"><a href="refer/" target="_blank" rel="noreferrer">Refer</a><a href="#social">Social</a><span class="status">Online</span></div>
+    </nav>
+  </header>
+
+  <main id="top">
+    <div class="shell hero">
+      <div>
+        <div class="system-label">Profile initialized</div>
+        <h1>Ray<span>.01</span></h1>
+        <div class="role"><span class="chip">00 后</span><span class="chip">大厂产品经理</span><span class="chip">美区 ITIN 云居民</span></div>
+        <p class="intro">关注港卡、美卡与出海基建，爱折腾，也坚持真分享。梦想是靠被动收入环游世界——正在持续积累中。</p>
+        <div class="hero-actions">
+          <a class="primary" href="https://x.com/RayAlwaysDay1" target="_blank" rel="noreferrer">Follow on X</a>
+          <a class="secondary" href="refer/" target="_blank" rel="noreferrer">Explore Refer</a>
+        </div>
+      </div>
+
+      <aside class="identity-card" aria-label="Ray 的数字身份卡">
+        <div class="card-ui">
+          <div class="card-head"><span>Identity / 001</span><span>CN → Global</span></div>
+          <div>
+            <div class="avatar-wrap"><img class="avatar" src="avatar.jpg" alt="Ray 的 X 头像"></div>
+            <div class="handle">RAY <small>@RayAlwaysDay1</small></div>
+          </div>
+          <div class="card-foot"><span>Builder mindset</span><span>Est. 2023</span></div>
+        </div>
+      </aside>
+    </div>
+
+    <div class="ticker" aria-hidden="true">
+      <div class="ticker-track"><span><b>●</b> ITIN CLOUD RESIDENT</span><span>PRODUCT THINKING</span><span>HK & US CARDS</span><span>GLOBAL INFRASTRUCTURE</span><span>TRUE SHARING</span><span><b>●</b> ITIN CLOUD RESIDENT</span><span>PRODUCT THINKING</span><span>HK & US CARDS</span><span>GLOBAL INFRASTRUCTURE</span><span>TRUE SHARING</span></div>
+    </div>
+
+    <section id="social" class="shell reveal">
+      <div class="section-head"><span class="section-index">01 // SOCIAL</span><h2>保持连接，<br>交换<em>信号。</em></h2></div>
+      <div class="social-console">
+        <a class="x-panel" href="https://x.com/RayAlwaysDay1" target="_blank" rel="noreferrer">
+          <div class="system-label">Primary channel</div>
+          <div class="x-name"><span>X</span> / Ray</div>
+          <div class="x-bottom"><p>关注我的最新动态、实操经验和长期积累。</p><span class="launch">Connect <i></i></span></div>
+        </a>
+        <a class="signal-panel" href="https://x.com/RayAlwaysDay1" target="_blank" rel="noreferrer">
+          <small>Signal node · active</small><div class="signal-ring" aria-hidden="true"></div><small>@RayAlwaysDay1</small>
+        </a>
+      </div>
+    </section>
+  </main>
+
+  <footer class="shell"><span>© <span id="year"></span> RayAlwaysDay1</span><span>Build globally · Share honestly</span></footer>
+
+  <script>
+    document.getElementById('year').textContent = new Date().getFullYear();
+    const observer = new IntersectionObserver((entries) => {
+      entries.forEach((entry) => { if (entry.isIntersecting) entry.target.classList.add('visible'); });
+    }, { threshold: 0.12 });
+    document.querySelectorAll('.reveal').forEach((el) => observer.observe(el));
+    if (matchMedia('(pointer:fine)').matches) {
+      addEventListener('pointermove', (event) => {
+        document.body.style.setProperty('--mx', `${event.clientX}px`);
+        document.body.style.setProperty('--my', `${event.clientY}px`);
+      });
+    }
+  </script>
+</body>
+</html>
