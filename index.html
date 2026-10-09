@@ -145,6 +145,26 @@
     .section-copy { max-width: 720px; margin: -24px 0 42px auto; color: #abb7ca; font-family: Inter, ui-sans-serif, sans-serif; font-size: 1rem; }
     .sr-only { position: absolute; width: 1px; height: 1px; padding: 0; margin: -1px; overflow: hidden; clip: rect(0,0,0,0); white-space: nowrap; border: 0; }
 
+    .map-intro { max-width: 760px; margin: -24px 0 42px auto; color: #abb7ca; font-family: Inter, ui-sans-serif, sans-serif; font-size: 1rem; }
+    .map-grid { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 16px; }
+    .route-panel { position: relative; padding: 28px; border: 1px solid var(--line); background: linear-gradient(145deg, rgba(18,25,37,.9), rgba(8,12,18,.66)); overflow: hidden; }
+    .route-panel::before { content: ""; position: absolute; inset: 0 0 auto; height: 2px; background: linear-gradient(90deg, var(--route-color), transparent 78%); }
+    .route-panel.us { --route-color: var(--cyan); }
+    .route-panel.hk { --route-color: #a995ff; }
+    .route-head { display: flex; align-items: start; justify-content: space-between; gap: 20px; margin-bottom: 28px; }
+    .route-kicker { display: block; margin-bottom: 8px; color: var(--route-color); font-size: .72rem; font-weight: 800; letter-spacing: .12em; text-transform: uppercase; }
+    .route-head h3 { margin: 0; font-family: Inter, ui-sans-serif, sans-serif; font-size: clamp(1.7rem, 3vw, 2.35rem); line-height: 1.05; letter-spacing: -.04em; }
+    .route-code { flex: 0 0 auto; width: 48px; height: 48px; display: grid; place-items: center; border: 1px solid color-mix(in srgb, var(--route-color) 45%, transparent); color: var(--route-color); font-size: .75rem; font-weight: 800; letter-spacing: .08em; }
+    .route-steps { margin: 0; padding: 0; list-style: none; counter-reset: route; }
+    .route-step { counter-increment: route; position: relative; min-height: 104px; margin-left: 20px; padding: 0 0 24px 42px; border-left: 1px solid rgba(137,164,205,.24); }
+    .route-step:last-child { min-height: auto; padding-bottom: 0; border-left-color: transparent; }
+    .route-step::before { content: counter(route, decimal-leading-zero); position: absolute; left: -20px; top: 0; width: 39px; height: 39px; display: grid; place-items: center; border: 1px solid var(--route-color); background: #0b1018; color: var(--route-color); font-size: .68rem; font-weight: 800; box-shadow: 0 0 18px color-mix(in srgb, var(--route-color) 14%, transparent); }
+    .route-step strong { display: block; margin-bottom: 7px; font-family: Inter, ui-sans-serif, sans-serif; font-size: 1.02rem; line-height: 1.3; }
+    .route-step p { margin: 0; color: #9eabba; font-family: Inter, ui-sans-serif, sans-serif; font-size: .9rem; line-height: 1.6; }
+    .route-tags { display: flex; flex-wrap: wrap; gap: 7px; margin-top: 12px; }
+    .route-tag { padding: 5px 8px; border: 1px solid rgba(137,164,205,.2); background: rgba(255,255,255,.025); color: #c2cada; font-size: .69rem; letter-spacing: .04em; }
+    .route-note { margin-top: 20px; padding-top: 18px; border-top: 1px solid var(--line); color: #758196; font-size: .76rem; }
+
     .refer-toolbar { margin-bottom: 28px; display: grid; grid-template-columns: 1fr auto; gap: 14px; align-items: center; }
     .search-wrap { position: relative; }
     .search-icon { position: absolute; left: 18px; top: 50%; transform: translateY(-50%); color: var(--cyan); pointer-events: none; }
@@ -251,6 +271,8 @@
       .identity-card, .card-ui { min-height: 460px; }
       .section-head { grid-template-columns: 1fr; gap: 12px; margin-bottom: 38px; }
       .section-copy { margin: -16px 0 34px; }
+      .map-intro { margin: -16px 0 34px; }
+      .map-grid { grid-template-columns: 1fr; }
       section { padding: 78px 0; }
       .link-grid, .social-console { grid-template-columns: 1fr; }
       .masonry { columns: 2 250px; column-gap: 12px; }
@@ -260,6 +282,7 @@
     }
     @media (max-width: 540px) {
       .topnav { gap: 14px; font-size: .72rem; }
+      .topnav a:first-child { display: none; }
       .topnav .status { display: none; }
       .hero-actions { flex-direction: column; }
       .primary, .secondary { width: 100%; }
@@ -282,7 +305,7 @@
   <header class="shell">
     <nav class="topbar" aria-label="主导航">
       <a class="wordmark" href="#top"><i aria-hidden="true"></i> Ray.OS</a>
-      <div class="topnav"><a href="#refer">Refer</a><a href="#contact">Contact</a><span class="status">Online</span></div>
+      <div class="topnav"><a href="#roadmap">Map</a><a href="#refer">Refer</a><a href="#contact">Contact</a><span class="status">Online</span></div>
     </nav>
   </header>
 
@@ -315,8 +338,35 @@
       <div class="ticker-track"><span><b>●</b> ITIN CLOUD RESIDENT</span><span>PRODUCT THINKING</span><span>HK & US CARDS</span><span>GLOBAL INFRASTRUCTURE</span><span>TRUE SHARING</span><span><b>●</b> ITIN CLOUD RESIDENT</span><span>PRODUCT THINKING</span><span>HK & US CARDS</span><span>GLOBAL INFRASTRUCTURE</span><span>TRUE SHARING</span></div>
     </div>
 
+    <section id="roadmap" class="shell reveal">
+      <div class="section-head"><span class="section-index">01 // ROADMAP</span><h2>从身份基建，<br>升级到<em>信用入口。</em></h2></div>
+      <p class="map-intro">一张面向中国用户的港卡 / 美卡进阶地图。先搭好号码、身份和地址，再逐步进入银行账户与信用体系。</p>
+      <div class="map-grid" aria-label="港卡与美卡升级地图">
+        <article class="route-panel us">
+          <div class="route-head"><div><span class="route-kicker">United States track</span><h3>美卡升级路线</h3></div><span class="route-code" aria-hidden="true">US</span></div>
+          <ol class="route-steps">
+            <li class="route-step"><strong>建立美区数字身份</strong><p>先准备稳定的美国联系方式、税务身份与可收信地址。</p><div class="route-tags"><span class="route-tag">Tello 电话卡</span><span class="route-tag">美区 Apple ID</span><span class="route-tag">ITIN</span><span class="route-tag">ATMB 美国地址</span></div></li>
+            <li class="route-step"><strong>申请入门信用卡</strong><p>身份与地址信息稳定后，尝试进入美国信用体系。</p><div class="route-tags"><span class="route-tag">Capital One</span><span class="route-tag">Discover</span></div></li>
+            <li class="route-step"><strong>收卡并转寄回国</strong><p>卡片寄到美国地址后，通过可靠渠道完成合并与国际转寄。</p><div class="route-tags"><span class="route-tag">ATMB 收件</span><span class="route-tag">转寄中国</span></div></li>
+            <li class="route-step"><strong>激活并建立信用档案</strong><p>完成卡片激活和首次使用，逐步让 Equifax 等征信机构形成信用记录。</p><div class="route-tags"><span class="route-tag">Card Activation</span><span class="route-tag">Equifax</span></div></li>
+          </ol>
+          <div class="route-note">申请结果取决于银行审核、身份资料与个人信用情况。</div>
+        </article>
+
+        <article class="route-panel hk">
+          <div class="route-head"><div><span class="route-kicker">Hong Kong track</span><h3>港卡升级路线</h3></div><span class="route-code" aria-hidden="true">HK</span></div>
+          <ol class="route-steps">
+            <li class="route-step"><strong>搭建香港银行账户</strong><p>先覆盖传统银行与数字银行，形成日常收付款基础。</p><div class="route-tags"><span class="route-tag">HSBC 汇丰</span><span class="route-tag">BOCHK 中银香港</span><span class="route-tag">ZA Bank 众安</span></div></li>
+            <li class="route-step"><strong>进入香港信用卡体系</strong><p>从常用消费场景切入，逐步建立本地信用记录。</p><div class="route-tags"><span class="route-tag">HSBC Pulse</span><span class="route-tag">HSBC Red</span></div></li>
+            <li class="route-step"><strong>升级跨境用卡组合</strong><p>补充适合大湾区与跨境消费的信用卡产品。</p><div class="route-tags"><span class="route-tag">CNCBI GBA 信银国际</span></div></li>
+          </ol>
+          <div class="route-note">产品资格、开户要求与批核标准以银行最新规则为准。</div>
+        </article>
+      </div>
+    </section>
+
     <section id="refer" class="shell reveal">
-      <div class="section-head"><span class="section-index">01 // REFER</span><h2>值得分享的，<br><em>真实入口。</em></h2></div>
+      <div class="section-head"><span class="section-index">02 // REFER</span><h2>值得分享的，<br><em>真实入口。</em></h2></div>
       <p class="section-copy">通信、跨境金融、信用卡与返利平台。点击卡片展开项目介绍、邀请奖励与申请条件；奖励会变化，请以跳转后的官方页面为准。</p>
       <div class="refer-toolbar">
         <label class="search-wrap"><span class="search-icon" aria-hidden="true">⌕</span><span class="sr-only">搜索 Refer</span><input class="search-input" id="refer-search" type="search" autocomplete="off" placeholder="搜索品牌、类别、地区或奖励…"></label>
@@ -328,7 +378,7 @@
     </section>
 
     <section id="contact" class="shell reveal">
-      <div class="section-head"><span class="section-index">02 // CONTACT</span><h2>保持连接，<br>交换<em>信号。</em></h2></div>
+      <div class="section-head"><span class="section-index">03 // CONTACT</span><h2>保持连接，<br>交换<em>信号。</em></h2></div>
       <div class="social-console">
         <a class="x-panel" href="https://x.com/RayAlwaysDay1" target="_blank" rel="noreferrer">
           <div class="system-label">Primary channel</div>
@@ -405,7 +455,7 @@
         referUrl: 'https://www.rakuten.com/r/JACOBW1740?eeid=44971', tutorialUrl: '', search: '购物 返现 cashback 酒店 机票'
       },
       {
-        id: 'ibkr', name: 'Interactive Brokers', mark: 'IBKR', category: 'Broker', region: 'Global',
+        id: 'ibkr', name: 'Interactive Brokers', mark: 'IBKR', category: 'Broker', region: 'Global', logo: 'logos/ibkr.svg', logoClass: 'wordmark',
         brandBg: '#f4f5f7', brandInk: '#d51f2a', orbit: 'rgba(213,31,42,.17)',
         summary: '全球券商，可交易美股、ETF、期权、期货等多市场产品。',
         reward: '新用户每净入金 $300 获 $1 IBKR 股票，最高 $1,000；推荐人满足条件后获 $200。',
@@ -413,15 +463,15 @@
         referUrl: 'https://ibkr.com/referral/ruixuan371', tutorialUrl: '', search: 'interactive brokers 券商 美股 股票 投资 trading brokerage'
       },
       {
-        id: 'plasma', name: 'Plasma One', mark: 'PLASMA', category: 'Stablecoin', region: 'Global',
-        brandBg: '#1d1233', brandInk: '#f5f0ff', orbit: 'rgba(182,145,255,.3)',
+        id: 'plasma', name: 'Plasma One', mark: 'PLASMA', category: 'Stablecoin', region: 'Global', logo: 'logos/plasma-dark.svg', logoClass: 'wordmark',
+        brandBg: '#dcefea', brandInk: '#162f29', orbit: 'rgba(22,47,41,.18)',
         summary: '以稳定币为核心的全球账户和 Visa 卡，支持消费、转账与收益功能。',
         reward: 'Lite 推荐返现 0.25%，Core 与 Platinum 为 1%，按受邀人的合资格消费计算。',
         conditions: '受邀用户需通过邀请完成注册，并产生符合活动规则的卡片消费；额外奖励以 App 为准。',
         referUrl: 'https://plasma.org/download/F73SJW', tutorialUrl: '', search: '稳定币 stablecoin visa crypto card 加密货币'
       },
       {
-        id: 'paypal', name: 'PayPal US', mark: 'PayPal', category: 'Wallet', region: 'US',
+        id: 'paypal', name: 'PayPal US', mark: 'PayPal', category: 'Wallet', region: 'US', logo: 'logos/paypal.svg',
         brandBg: '#eaf5ff', brandInk: '#003087', orbit: 'rgba(0,112,186,.2)',
         summary: '美国数字钱包与线上支付账户，可购物、收付款并连接银行卡。',
         reward: '官方当前邀请活动为双方各 $10，活动金额和结束时间可能调整。',
