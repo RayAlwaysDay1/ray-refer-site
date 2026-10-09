@@ -163,6 +163,10 @@
     .route-step p { margin: 0; color: #9eabba; font-family: Inter, ui-sans-serif, sans-serif; font-size: .9rem; line-height: 1.6; }
     .route-tags { display: flex; flex-wrap: wrap; gap: 7px; margin-top: 12px; }
     .route-tag { padding: 5px 8px; border: 1px solid rgba(137,164,205,.2); background: rgba(255,255,255,.025); color: #c2cada; font-size: .69rem; letter-spacing: .04em; }
+    .route-guides { display: flex; flex-wrap: wrap; gap: 7px; margin-top: 10px; }
+    .route-guide { display: inline-flex; align-items: center; gap: 6px; padding: 6px 9px; border: 1px solid color-mix(in srgb, var(--route-color) 38%, transparent); background: color-mix(in srgb, var(--route-color) 7%, transparent); color: var(--route-color); font-size: .7rem; font-weight: 700; text-decoration: none; letter-spacing: .03em; transition: border-color .2s ease, background .2s ease, transform .2s ease; }
+    .route-guide:hover { border-color: var(--route-color); background: color-mix(in srgb, var(--route-color) 13%, transparent); transform: translateY(-1px); }
+    .route-guide:focus-visible { outline: 2px solid var(--route-color); outline-offset: 3px; }
     .route-note { margin-top: 20px; padding-top: 18px; border-top: 1px solid var(--line); color: #758196; font-size: .76rem; }
 
     .refer-toolbar { margin-bottom: 28px; display: grid; grid-template-columns: 1fr auto; gap: 14px; align-items: center; }
@@ -356,9 +360,9 @@
         <article class="route-panel hk">
           <div class="route-head"><div><span class="route-kicker">Hong Kong track</span><h3>港卡升级路线</h3></div><span class="route-code" aria-hidden="true">HK</span></div>
           <ol class="route-steps">
-            <li class="route-step"><strong>搭建香港银行账户</strong><p>先覆盖传统银行与数字银行，形成日常收付款基础。</p><div class="route-tags"><span class="route-tag">HSBC 汇丰</span><span class="route-tag">BOCHK 中银香港</span><span class="route-tag">ZA Bank 众安</span></div></li>
-            <li class="route-step"><strong>进入香港信用卡体系</strong><p>从常用消费场景切入，逐步建立本地信用记录。</p><div class="route-tags"><span class="route-tag">HSBC Pulse</span><span class="route-tag">HSBC Red</span></div></li>
-            <li class="route-step"><strong>升级跨境用卡组合</strong><p>补充适合大湾区与跨境消费的信用卡产品。</p><div class="route-tags"><span class="route-tag">CNCBI GBA 信银国际</span></div></li>
+            <li class="route-step"><strong>搭建香港银行账户</strong><p>先覆盖传统银行与数字银行，形成日常收付款基础。</p><div class="route-tags"><span class="route-tag">HSBC 汇丰</span><span class="route-tag">BOCHK 中银香港</span><span class="route-tag">ZA Bank 众安</span></div><div class="route-guides"><a class="route-guide" href="https://x.com/RayAlwaysDay1/status/2107254450045981092?s=20" target="_blank" rel="noreferrer">汇丰开户教程 <span aria-hidden="true">↗</span></a></div></li>
+            <li class="route-step"><strong>进入香港信用卡体系</strong><p>从常用消费场景切入，逐步建立本地信用记录。</p><div class="route-tags"><span class="route-tag">HSBC Pulse</span><span class="route-tag">HSBC Red</span></div><div class="route-guides"><a class="route-guide" href="https://x.com/RayAlwaysDay1/status/2105860519420936211?s=20" target="_blank" rel="noreferrer">汇丰 Pulse 教程 <span aria-hidden="true">↗</span></a></div></li>
+            <li class="route-step"><strong>升级跨境用卡组合</strong><p>补充适合大湾区与跨境消费的信用卡产品。</p><div class="route-tags"><span class="route-tag">CNCBI GBA 信银国际</span></div><div class="route-guides"><a class="route-guide" href="https://x.com/RayAlwaysDay1/status/2106398937439772987?s=20" target="_blank" rel="noreferrer">信银 GBA 教程 <span aria-hidden="true">↗</span></a></div></li>
           </ol>
           <div class="route-note">产品资格、开户要求与批核标准以银行最新规则为准。</div>
         </article>
@@ -370,7 +374,7 @@
       <p class="section-copy">通信、跨境金融、信用卡与返利平台。点击卡片展开项目介绍、邀请奖励与申请条件；奖励会变化，请以跳转后的官方页面为准。</p>
       <div class="refer-toolbar">
         <label class="search-wrap"><span class="search-icon" aria-hidden="true">⌕</span><span class="sr-only">搜索 Refer</span><input class="search-input" id="refer-search" type="search" autocomplete="off" placeholder="搜索品牌、类别、地区或奖励…"></label>
-        <div class="result-count" aria-live="polite">找到 <b id="result-count">10</b> 个项目</div>
+        <div class="result-count" aria-live="polite">找到 <b id="result-count">11</b> 个项目</div>
       </div>
       <div class="masonry" id="refer-grid" aria-label="Refer 推荐项目"></div>
       <div class="empty-state" id="empty-state" hidden><strong>没有找到相关项目</strong><span>换一个品牌名、类别或关键词试试。</span></div>
@@ -444,7 +448,7 @@
         summary: '购物前从平台跳转到品牌官网，订单确认后获得现金返还。',
         reward: '当前推荐人奖励 $10；受邀人达标后可正常提取自己的购物返现。',
         conditions: '受邀人需注册新账户，并在 365 天内从合资格商家赚到至少 $10 可提取返现。',
-        referUrl: 'https://www.topcashback.com/ref/jacobwrx', tutorialUrl: '', search: '购物 返现 cashback 酒店 机票'
+        referUrl: 'https://www.topcashback.com/ref/jacobwrx', tutorialUrl: 'https://x.com/RayAlwaysDay1/status/2108349719596687497?s=20', search: '购物 返现 cashback 酒店 机票'
       },
       {
         id: 'rakuten', name: 'Rakuten', category: 'Cashback', region: 'US', logo: 'logos/rakuten.png',
@@ -452,7 +456,7 @@
         summary: '美国主流购物返现入口，覆盖电商、酒店、机票及线下合作商户。',
         reward: '官方奖励为轮换活动；常规档约双方各 $30，限时活动可能更高。',
         conditions: '需为新会员，并在活动规定时间内完成达到门槛的合资格订单；以注册当天页面为准。',
-        referUrl: 'https://www.rakuten.com/r/JACOBW1740?eeid=44971', tutorialUrl: '', search: '购物 返现 cashback 酒店 机票'
+        referUrl: 'https://www.rakuten.com/r/JACOBW1740?eeid=44971', tutorialUrl: 'https://x.com/RayAlwaysDay1/status/2107849812376981684?s=20', search: '购物 返现 cashback 酒店 机票'
       },
       {
         id: 'ibkr', name: 'Interactive Brokers', mark: 'IBKR', category: 'Broker', region: 'Global', logo: 'logos/ibkr.svg', logoClass: 'wordmark',
@@ -477,6 +481,14 @@
         reward: '官方当前邀请活动为双方各 $10，活动金额和结束时间可能调整。',
         conditions: '需为符合资格的美国新用户，通过邀请链接注册并在活动期内完成页面指定任务。',
         referUrl: 'https://py.pl/1ONLKJ', tutorialUrl: '', search: '支付 钱包 payment wallet paypal 美国'
+      },
+      {
+        id: 'pirate-ship', name: 'Pirate Ship', mark: 'PIRATE SHIP', category: 'Shipping', region: 'US', logo: 'logos/pirate-ship.svg',
+        brandBg: '#0b4260', brandInk: '#ffffff', orbit: 'rgba(67,193,224,.22)',
+        summary: '美国在线打单与寄件平台，提供 USPS、UPS 折扣运费，适合美国境内寄送和转运前置操作。',
+        reward: '官方目前没有邀请返现或联盟奖励；平台本身免月费、无隐藏加价，主要价值是直接获取折扣运单价格。',
+        conditions: '需注册账户并验证邮箱；仅支持从美国地址寄出的 USPS 或 UPS 包裹，购买标签前需准备包裹尺寸与重量。',
+        referUrl: 'https://ship.pirateship.com/ship', tutorialUrl: 'https://x.com/RayAlwaysDay1/status/2105476872884924483?s=20', search: '寄件 物流 打单 shipping label usps ups 美国 转运'
       }
     ];
 
