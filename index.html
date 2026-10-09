@@ -215,8 +215,8 @@
     .summary { display: block; margin: 12px 0 0; color: #aab5c8; font-family: Inter, ui-sans-serif, sans-serif; font-size: .92rem; }
     .tap-hint { margin-top: 17px; padding-top: 13px; display: flex; justify-content: space-between; border-top: 1px solid var(--line); color: var(--cyan); font-size: .73rem; font-weight: 800; letter-spacing: .07em; text-transform: uppercase; }
 
-    .card-details { max-height: 0; opacity: 0; overflow: hidden; border-top: 0 solid var(--line); transition: max-height .42s ease, opacity .28s ease, border-width .1s ease; }
-    .is-open .card-details { max-height: 780px; opacity: 1; border-top-width: 1px; }
+    .card-details { display: none; border-top: 1px solid var(--line); }
+    .is-open .card-details { display: block; }
     .details-inner { padding: 22px; }
     .detail-grid { display: grid; gap: 16px; }
     .detail { padding-left: 13px; border-left: 2px solid rgba(137,164,205,.25); }
@@ -536,19 +536,28 @@
 
     referrals.forEach((item) => grid.appendChild(renderCard(item)));
     const cards = [...grid.querySelectorAll('.refer-card')];
-    cards.forEach((card) => {
+    function setCardOpen(card, isOpen) {
       const toggle = card.querySelector('.card-toggle');
-      toggle.addEventListener('click', () => {
+      const details = card.querySelector('.card-details');
+      card.classList.toggle('is-open', isOpen);
+      toggle.setAttribute('aria-expanded', String(isOpen));
+      details.setAttribute('aria-hidden', String(!isOpen));
+      if (isOpen) {
+        details.removeAttribute('inert');
+      } else {
+        details.setAttribute('inert', '');
+      }
+    }
+
+    cards.forEach((card) => {
+      card.querySelector('.card-toggle').addEventListener('click', () => {
         const nextState = !card.classList.contains('is-open');
-        const details = card.querySelector('.card-details');
-        card.classList.toggle('is-open', nextState);
-        toggle.setAttribute('aria-expanded', String(nextState));
-        details.setAttribute('aria-hidden', String(!nextState));
         if (nextState) {
-          details.removeAttribute('inert');
-        } else {
-          details.setAttribute('inert', '');
+          cards.forEach((otherCard) => {
+            if (otherCard !== card && otherCard.classList.contains('is-open')) setCardOpen(otherCard, false);
+          });
         }
+        setCardOpen(card, nextState);
       });
     });
 
