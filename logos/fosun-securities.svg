@@ -1,0 +1,10 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 520 120" role="img" aria-labelledby="title">
+  <title id="title">Fosun Securities</title>
+  <g transform="translate(20 18)">
+    <path d="M42 0 84 42 42 84 0 42Z" fill="#1e4e9d"/>
+    <path d="M42 18 66 42 42 66 18 42Z" fill="#fff"/>
+    <path d="M42 28 56 42 42 56 28 42Z" fill="#e43d3d"/>
+  </g>
+  <text x="124" y="65" fill="#1c2a47" font-family="Arial, Helvetica, sans-serif" font-size="42" font-weight="700">FOSUN</text>
+  <text x="124" y="94" fill="#53627a" font-family="Arial, Helvetica, sans-serif" font-size="22" letter-spacing="5">SECURITIES</text>
+</svg>
