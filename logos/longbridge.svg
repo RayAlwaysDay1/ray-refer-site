@@ -1,0 +1,8 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 500 120" role="img" aria-labelledby="title">
+  <title id="title">Longbridge</title>
+  <g fill="none" stroke="#f04438" stroke-width="10" stroke-linecap="round" stroke-linejoin="round">
+    <path d="M24 79h72M32 79V55h56v24M42 55V38M78 55V38M42 38h36"/>
+    <path d="M48 79V65M72 79V65"/>
+  </g>
+  <text x="119" y="80" fill="#292d32" font-family="Arial, Helvetica, sans-serif" font-size="48" font-weight="700">LONG BRIDGE</text>
+</svg>
