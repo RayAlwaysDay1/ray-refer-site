@@ -169,7 +169,7 @@
     .route-guide:focus-visible { outline: 2px solid var(--route-color); outline-offset: 3px; }
     .route-note { margin-top: 20px; padding-top: 18px; border-top: 1px solid var(--line); color: #758196; font-size: .76rem; }
 
-    .refer-toolbar { margin-bottom: 28px; display: grid; grid-template-columns: 1fr auto; gap: 14px; align-items: center; }
+    .refer-toolbar { margin-bottom: 14px; display: grid; grid-template-columns: 1fr auto; gap: 14px; align-items: center; }
     .search-wrap { position: relative; }
     .search-icon { position: absolute; left: 18px; top: 50%; transform: translateY(-50%); color: var(--cyan); pointer-events: none; }
     .search-input { width: 100%; min-height: 54px; padding: 0 50px; border: 1px solid rgba(116,247,255,.22); border-radius: 0; background: #090f17; color: var(--text); font: inherit; outline: none; transition: border-color .2s ease, box-shadow .2s ease; }
@@ -177,6 +177,12 @@
     .search-input:focus { border-color: var(--cyan); box-shadow: 0 0 0 3px rgba(116,247,255,.08), 0 0 24px rgba(116,247,255,.06); }
     .result-count { min-width: 142px; padding: 15px 18px; border: 1px solid var(--line); color: var(--muted); font-size: .76rem; text-align: center; letter-spacing: .06em; text-transform: uppercase; }
     .result-count b { color: var(--cyan); font-size: 1rem; }
+    .category-filters { margin-bottom: 28px; display: flex; flex-wrap: wrap; align-items: center; gap: 8px; }
+    .filter-label { margin-right: 4px; color: var(--muted); font-size: .72rem; letter-spacing: .08em; text-transform: uppercase; }
+    .filter-button { min-height: 36px; padding: 7px 13px; border: 1px solid var(--line); background: rgba(255,255,255,.025); color: #aab5c8; font: inherit; font-size: .75rem; cursor: pointer; transition: color .2s ease, border-color .2s ease, background .2s ease; }
+    .filter-button:hover { color: var(--text); border-color: rgba(116,247,255,.42); }
+    .filter-button[aria-pressed="true"] { color: #061013; border-color: var(--cyan); background: var(--cyan); box-shadow: 0 0 20px rgba(116,247,255,.12); }
+    .filter-button:focus-visible { outline: 2px solid var(--cyan); outline-offset: 3px; }
 
     .masonry { display: grid; grid-template-columns: repeat(var(--masonry-columns, 3), minmax(0, 1fr)); gap: 16px; align-items: start; }
     .masonry-column { min-width: 0; display: flex; flex-direction: column; gap: 16px; }
@@ -374,6 +380,15 @@
         <label class="search-wrap"><span class="search-icon" aria-hidden="true">⌕</span><span class="sr-only">搜索 Refer</span><input class="search-input" id="refer-search" type="search" autocomplete="off" placeholder="搜索品牌、类别、地区或奖励…"></label>
         <div class="result-count" aria-live="polite">找到 <b id="result-count">11</b> 个项目</div>
       </div>
+      <div class="category-filters" role="group" aria-label="Refer 分类">
+        <span class="filter-label">快速分类</span>
+        <button class="filter-button" type="button" data-filter="all" aria-pressed="true">全部</button>
+        <button class="filter-button" type="button" data-filter="bank" aria-pressed="false">银行</button>
+        <button class="filter-button" type="button" data-filter="broker" aria-pressed="false">券商</button>
+        <button class="filter-button" type="button" data-filter="payment" aria-pressed="false">支付</button>
+        <button class="filter-button" type="button" data-filter="esim" aria-pressed="false">eSIM</button>
+        <button class="filter-button" type="button" data-filter="cashback" aria-pressed="false">返利平台</button>
+      </div>
       <div class="masonry" id="refer-grid" aria-label="Refer 推荐项目"></div>
       <div class="empty-state" id="empty-state" hidden><strong>没有找到相关项目</strong><span>换一个品牌名、类别或关键词试试。</span></div>
       <aside class="disclosure"><b>Refer 说明</b><span>部分链接为推荐链接，我可能在你完成指定条件后获得奖励。奖励信息已于 2026-10-09 核对；地区、账户与活动时间可能影响最终资格。</span></aside>
@@ -400,7 +415,7 @@
     // 每个项目独立维护 referUrl 与 tutorialUrl；tutorialUrl 为空时自动隐藏教程按钮。
     const referrals = [
       {
-        id: 'tello', name: 'Tello', category: 'Mobile', region: 'US', logo: 'logos/tello.png',
+        id: 'tello', name: 'Tello', category: 'Mobile', group: 'esim', region: 'US', logo: 'logos/tello.png',
         brandBg: '#eaf5ff', brandInk: '#1287d2', orbit: 'rgba(18,135,210,.2)',
         summary: '美国无合约预付费手机服务，支持 eSIM 和自定义套餐。',
         reward: '新用户首单后立即获 $10 Tello Dollars；推荐人待对方持续使用约 3 个月后获 $10。',
@@ -409,7 +424,7 @@
         search: '手机 电话卡 esim prepaid'
       },
       {
-        id: 'wise', name: 'Wise', category: 'Money', region: 'Global', logo: 'logos/wise.png',
+        id: 'wise', name: 'Wise', category: 'Money', group: 'payment', region: 'Global', logo: 'logos/wise.png',
         brandBg: '#9fe870', brandInk: '#163300', orbit: 'rgba(22,51,0,.16)',
         summary: '跨境转账、多币种账户与借记卡平台，适合国际收付款。',
         reward: '受邀人通常可获免手续费转账或免费卡；推荐人金额及门槛因地区与账户而异。',
@@ -417,7 +432,7 @@
         referUrl: '', tutorialUrl: '', search: '汇款 多币种 debit card international'
       },
       {
-        id: 'za-bank', name: 'ZA Bank', category: 'Bank', region: 'HK', logo: 'logos/za-bank.png',
+        id: 'za-bank', name: 'ZA Bank', category: 'Bank', group: 'bank', region: 'HK', logo: 'logos/za-bank.png',
         brandBg: '#071d27', brandInk: '#f3fffd', orbit: 'rgba(52,204,176,.28)',
         summary: '香港持牌数字银行，提供存款、转账、银行卡与贷款等服务。',
         reward: '邀请奖励随 ZA App 内活动变化；当前金额与任务以链接打开后的活动页为准。',
@@ -425,7 +440,7 @@
         referUrl: 'https://l.za.group/r7M7N', tutorialUrl: '', search: '香港 数字银行 bank hk'
       },
       {
-        id: 'discover', name: 'Discover', category: 'Credit', region: 'US', logo: 'logos/discover.svg',
+        id: 'discover', name: 'Discover', category: 'Credit', group: 'bank', region: 'US', logo: 'logos/discover.svg',
         brandBg: '#fff1e8', brandInk: '#d9541d', orbit: 'rgba(217,84,29,.16)',
         summary: '美国信用卡与金融服务品牌，主打返现、学生卡和信用建立。',
         reward: '符合条件的推荐人与新用户各获账单抵扣；金额、卡种和年度上限以专属邀请页为准。',
@@ -433,7 +448,7 @@
         referUrl: '', tutorialUrl: '', search: '信用卡 credit card cashback student'
       },
       {
-        id: 'lemfi', name: 'LemFi', category: 'Transfer', region: 'Global', logo: 'logos/lemfi.png',
+        id: 'lemfi', name: 'LemFi', category: 'Transfer', group: 'payment', region: 'Global', logo: 'logos/lemfi.png',
         brandBg: '#d8f6e6', brandInk: '#132f28', orbit: 'rgba(19,47,40,.13)',
         summary: '面向跨境用户的国际汇款与多币种账户服务。',
         reward: '美国活动：新用户完成条件后，推荐人与受邀人双方各获 $20。',
@@ -441,7 +456,7 @@
         referUrl: '', tutorialUrl: '', search: '国际汇款 remittance transfer immigration'
       },
       {
-        id: 'topcashback', name: 'TopCashback', category: 'Cashback', region: 'US', logo: 'logos/topcashback-wordmark.webp', logoClass: 'wordmark',
+        id: 'topcashback', name: 'TopCashback', category: 'Cashback', group: 'cashback', region: 'US', logo: 'logos/topcashback-wordmark.webp', logoClass: 'wordmark',
         brandBg: '#ffffff', brandInk: '#005b46', orbit: 'rgba(0,91,70,.14)',
         summary: '购物前从平台跳转到品牌官网，订单确认后获得现金返还。',
         reward: '当前推荐人奖励 $10；受邀人达标后可正常提取自己的购物返现。',
@@ -449,7 +464,7 @@
         referUrl: 'https://www.topcashback.com/ref/jacobwrx', tutorialUrl: 'https://x.com/RayAlwaysDay1/status/2108349719596687497?s=20', search: '购物 返现 cashback 酒店 机票'
       },
       {
-        id: 'rakuten', name: 'Rakuten', category: 'Cashback', region: 'US', logo: 'logos/rakuten.png',
+        id: 'rakuten', name: 'Rakuten', category: 'Cashback', group: 'cashback', region: 'US', logo: 'logos/rakuten.png',
         brandBg: '#fff5f5', brandInk: '#bf0000', orbit: 'rgba(191,0,0,.14)',
         summary: '美国主流购物返现入口，覆盖电商、酒店、机票及线下合作商户。',
         reward: '官方奖励为轮换活动；常规档约双方各 $30，限时活动可能更高。',
@@ -457,7 +472,7 @@
         referUrl: 'https://www.rakuten.com/r/JACOBW1740?eeid=44971', tutorialUrl: 'https://x.com/RayAlwaysDay1/status/2107849812376981684?s=20', search: '购物 返现 cashback 酒店 机票'
       },
       {
-        id: 'ibkr', name: 'Interactive Brokers', mark: 'IBKR', category: 'Broker', region: 'Global', logo: 'logos/ibkr.svg', logoClass: 'wordmark',
+        id: 'ibkr', name: 'Interactive Brokers', mark: 'IBKR', category: 'Broker', group: 'broker', region: 'Global', logo: 'logos/ibkr.svg', logoClass: 'wordmark',
         brandBg: '#f4f5f7', brandInk: '#d51f2a', orbit: 'rgba(213,31,42,.17)',
         summary: '全球券商，可交易美股、ETF、期权、期货等多市场产品。',
         reward: '新用户每净入金 $300 获 $1 IBKR 股票，最高 $1,000；推荐人满足条件后获 $200。',
@@ -465,7 +480,7 @@
         referUrl: 'https://ibkr.com/referral/ruixuan371', tutorialUrl: '', search: 'interactive brokers 券商 美股 股票 投资 trading brokerage'
       },
       {
-        id: 'plasma', name: 'Plasma One', mark: 'PLASMA', category: 'Stablecoin', region: 'Global', logo: 'logos/plasma-dark.svg', logoClass: 'wordmark',
+        id: 'plasma', name: 'Plasma One', mark: 'PLASMA', category: 'Stablecoin', group: 'payment', region: 'Global', logo: 'logos/plasma-dark.svg', logoClass: 'wordmark',
         brandBg: '#dcefea', brandInk: '#162f29', orbit: 'rgba(22,47,41,.18)',
         summary: '以稳定币为核心的全球账户和 Visa 卡，支持消费、转账与收益功能。',
         reward: 'Lite 推荐返现 0.25%，Core 与 Platinum 为 1%，按受邀人的合资格消费计算。',
@@ -473,7 +488,7 @@
         referUrl: 'https://plasma.org/download/F73SJW', tutorialUrl: '', search: '稳定币 stablecoin visa crypto card 加密货币'
       },
       {
-        id: 'paypal', name: 'PayPal US', mark: 'PayPal', category: 'Wallet', region: 'US', logo: 'logos/paypal.svg',
+        id: 'paypal', name: 'PayPal US', mark: 'PayPal', category: 'Wallet', group: 'payment', region: 'US', logo: 'logos/paypal.svg',
         brandBg: '#eaf5ff', brandInk: '#003087', orbit: 'rgba(0,112,186,.2)',
         summary: '美国数字钱包与线上支付账户，可购物、收付款并连接银行卡。',
         reward: '官方当前邀请活动为双方各 $10，活动金额和结束时间可能调整。',
@@ -481,7 +496,7 @@
         referUrl: 'https://py.pl/1ONLKJ', tutorialUrl: '', search: '支付 钱包 payment wallet paypal 美国'
       },
       {
-        id: 'pirate-ship', name: 'Pirate Ship', mark: 'PIRATE SHIP', category: 'Shipping', region: 'US', logo: 'logos/pirate-ship.svg',
+        id: 'pirate-ship', name: 'Pirate Ship', mark: 'PIRATE SHIP', category: 'Shipping', group: 'other', region: 'US', logo: 'logos/pirate-ship.svg',
         brandBg: '#0b4260', brandInk: '#ffffff', orbit: 'rgba(67,193,224,.22)',
         summary: '美国在线打单与寄件平台，提供 USPS、UPS 折扣运费，适合美国境内寄送和转运前置操作。',
         reward: '官方目前没有邀请返现或联盟奖励；平台本身免月费、无隐藏加价，主要价值是直接获取折扣运单价格。',
@@ -494,6 +509,8 @@
     const searchInput = document.getElementById('refer-search');
     const resultCount = document.getElementById('result-count');
     const emptyState = document.getElementById('empty-state');
+    const filterButtons = [...document.querySelectorAll('.filter-button')];
+    let activeFilter = 'all';
 
     function renderCard(item) {
       const active = Boolean(item.referUrl);
@@ -509,6 +526,7 @@
       const card = document.createElement('article');
       card.className = 'refer-card' + (active ? '' : ' pending');
       card.dataset.search = item.search + ' ' + item.name + ' ' + item.category + ' ' + item.region;
+      card.dataset.group = item.group || 'other';
       card.innerHTML =
         '<button class="card-toggle" type="button" aria-expanded="false" aria-controls="details-' + item.id + '">' +
           '<span class="logo-box ' + (item.logoClass || '') + '" style="--brand-bg:' + item.brandBg + ';--brand-ink:' + item.brandInk + ';--orbit:' + item.orbit + '">' + logo + '</span>' +
@@ -599,7 +617,10 @@
       let visible = 0;
       cards.forEach((card) => {
         const searchableText = (card.textContent + ' ' + (card.dataset.search || '')).toLocaleLowerCase('zh-CN');
-        card.hidden = query !== '' && !searchableText.includes(query);
+        const matchesQuery = query === '' || searchableText.includes(query);
+        const matchesCategory = activeFilter === 'all' || card.dataset.group === activeFilter;
+        card.hidden = !(matchesQuery && matchesCategory);
+        if (card.hidden && card.classList.contains('is-open')) setCardOpen(card, false);
         if (!card.hidden) visible += 1;
       });
       resultCount.textContent = String(visible);
@@ -607,6 +628,13 @@
       layoutMasonry(true);
     }
     searchInput.addEventListener('input', applySearch);
+    filterButtons.forEach((button) => {
+      button.addEventListener('click', () => {
+        activeFilter = button.dataset.filter;
+        filterButtons.forEach((item) => item.setAttribute('aria-pressed', String(item === button)));
+        applySearch();
+      });
+    });
     let resizeFrame = 0;
     addEventListener('resize', () => {
       cancelAnimationFrame(resizeFrame);
