@@ -178,12 +178,12 @@
     .result-count { min-width: 142px; padding: 15px 18px; border: 1px solid var(--line); color: var(--muted); font-size: .76rem; text-align: center; letter-spacing: .06em; text-transform: uppercase; }
     .result-count b { color: var(--cyan); font-size: 1rem; }
 
-    .masonry { columns: 3 300px; column-gap: 16px; }
+    .masonry { display: grid; grid-template-columns: repeat(var(--masonry-columns, 3), minmax(0, 1fr)); gap: 16px; align-items: start; }
+    .masonry-column { min-width: 0; display: flex; flex-direction: column; gap: 16px; }
     .refer-card {
-      break-inside: avoid;
-      display: inline-block;
+      display: block;
       width: 100%;
-      margin: 0 0 16px;
+      margin: 0;
       border: 1px solid var(--line);
       background: var(--panel);
       vertical-align: top;
@@ -279,8 +279,7 @@
       .map-grid { grid-template-columns: 1fr; }
       section { padding: 78px 0; }
       .link-grid, .social-console { grid-template-columns: 1fr; }
-      .masonry { columns: 2 250px; column-gap: 12px; }
-      .refer-card { margin-bottom: 12px; }
+      .masonry, .masonry-column { gap: 12px; }
       .link-card { min-height: 230px; }
       .x-panel, .signal-panel { min-height: 290px; }
     }
@@ -292,7 +291,6 @@
       .primary, .secondary { width: 100%; }
       .refer-toolbar { grid-template-columns: 1fr; }
       .result-count { text-align: left; }
-      .masonry { columns: 1; }
       .card-actions { grid-template-columns: 1fr; }
       .disclosure { flex-direction: column; gap: 7px; }
       .x-bottom { flex-direction: column; align-items: stretch; }
@@ -536,6 +534,41 @@
 
     referrals.forEach((item) => grid.appendChild(renderCard(item)));
     const cards = [...grid.querySelectorAll('.refer-card')];
+    let masonryColumnCount = 0;
+
+    function getMasonryColumnCount() {
+      if (matchMedia('(max-width: 540px)').matches) return 1;
+      if (matchMedia('(max-width: 860px)').matches) return 2;
+      return 3;
+    }
+
+    function layoutMasonry(force = false) {
+      const nextColumnCount = getMasonryColumnCount();
+      if (!force && nextColumnCount === masonryColumnCount) return;
+      masonryColumnCount = nextColumnCount;
+      grid.style.setProperty('--masonry-columns', String(nextColumnCount));
+
+      const columns = Array.from({ length: nextColumnCount }, () => {
+        const column = document.createElement('div');
+        column.className = 'masonry-column';
+        return column;
+      });
+      const hiddenCards = [];
+      let visibleIndex = 0;
+      cards.forEach((card) => {
+        if (card.hidden) {
+          hiddenCards.push(card);
+        } else {
+          columns[visibleIndex % nextColumnCount].appendChild(card);
+          visibleIndex += 1;
+        }
+      });
+      hiddenCards.forEach((card) => columns[0].appendChild(card));
+      grid.replaceChildren(...columns);
+    }
+
+    layoutMasonry(true);
+
     function setCardOpen(card, isOpen) {
       const toggle = card.querySelector('.card-toggle');
       const details = card.querySelector('.card-details');
@@ -571,8 +604,14 @@
       });
       resultCount.textContent = String(visible);
       emptyState.hidden = visible !== 0;
+      layoutMasonry(true);
     }
     searchInput.addEventListener('input', applySearch);
+    let resizeFrame = 0;
+    addEventListener('resize', () => {
+      cancelAnimationFrame(resizeFrame);
+      resizeFrame = requestAnimationFrame(() => layoutMasonry());
+    });
 
     document.getElementById('year').textContent = new Date().getFullYear();
     const observer = new IntersectionObserver((entries) => {
