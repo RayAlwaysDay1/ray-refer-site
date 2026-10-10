@@ -11,7 +11,9 @@
   const stageOrder = Object.keys(STAGES), kindOrder = Object.keys(KINDS);
   const canvas = document.querySelector('#graph'), ctx = canvas.getContext('2d');
   const wrap = document.querySelector('#graph-wrap'), detail = document.querySelector('#detail');
-  const state = { data: null, nodes: [], edges: [], selected: null, hovered: null, hoveredEdge: null, drag: null, activePath: null, stages: new Set(stageOrder), kinds: new Set(kindOrder), scale: 1, tx: 0, ty: 0, width: 0, height: 0, dirty: true, running: true };
+  const state = { data: null, nodes: [], edges: [], selected: null, hovered: null, hoveredEdge: null, drag: null, activePath: 'p1', showAll: false, stages: new Set(stageOrder), kinds: new Set(kindOrder), scale: 1, tx: 0, ty: 0, width: 0, height: 0, dirty: true, running: false };
+  const MAIN_PATH = new Set(['address','itin','c1','hilton','green','chase-hotel','venturex']);
+  const MONITORS = new Set(['equifax','tu','ex']);
 
   const esc = (s) => String(s).replace(/[&<>"']/g, m => ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#039;'}[m]));
   const sourceId = e => typeof e.source === 'object' ? e.source.id : e.source;
@@ -23,43 +25,54 @@
     stageBox.innerHTML = stageOrder.map(key => `<button class="check" type="button" data-stage="${key}" aria-pressed="true"><span>${STAGES[key][0]}</span><i class="dot" style="--c:${STAGES[key][1]}"></i></button>`).join('');
     const edgeBox = document.querySelector('#edge-filters');
     edgeBox.innerHTML = kindOrder.map(key => `<button class="check" type="button" data-kind="${key}" aria-pressed="true"><span>${KINDS[key][0]}</span><i class="dot" style="--c:${KINDS[key][1]}"></i></button>`).join('');
-    document.querySelector('#path-filters').innerHTML = Object.entries(PATHS).map(([key,label]) => `<button class="path" type="button" data-path="${key}" aria-pressed="false">${label}</button>`).join('');
+    document.querySelector('#path-filters').innerHTML = Object.entries(PATHS).map(([key,label]) => `<button class="path" type="button" data-path="${key}" aria-pressed="${key==='p1'}">${label}</button>`).join('');
     document.querySelector('#legend').insertAdjacentHTML('beforeend', kindOrder.map(key => `<div class="legend-row"><i class="legend-line ${key==='optional'?'dash':key==='monitors'?'dotline':key==='stacks'?'double':''}" style="--lc:${KINDS[key][1]}"></i><span>${KINDS[key][0]}</span></div>`).join(''));
 
     stageBox.addEventListener('click', e => { const b=e.target.closest('[data-stage]'); if(!b)return; const k=b.dataset.stage; state.stages.has(k)?state.stages.delete(k):state.stages.add(k); b.setAttribute('aria-pressed',state.stages.has(k)); applyFilters(); });
     edgeBox.addEventListener('click', e => { const b=e.target.closest('[data-kind]'); if(!b)return; const k=b.dataset.kind; state.kinds.has(k)?state.kinds.delete(k):state.kinds.add(k); b.setAttribute('aria-pressed',state.kinds.has(k)); applyFilters(); });
-    document.querySelector('#path-filters').addEventListener('click', e => { const b=e.target.closest('[data-path]'); if(!b)return; state.activePath=state.activePath===b.dataset.path?null:b.dataset.path; document.querySelectorAll('[data-path]').forEach(x=>x.setAttribute('aria-pressed',x.dataset.path===state.activePath)); applyFilters(true); });
-    document.querySelector('#reset-filters').onclick = () => { state.activePath=null; state.stages=new Set(stageOrder); state.kinds=new Set(kindOrder); document.querySelectorAll('[data-stage],[data-kind]').forEach(x=>x.setAttribute('aria-pressed','true')); document.querySelectorAll('[data-path]').forEach(x=>x.setAttribute('aria-pressed','false')); applyFilters(true); };
+    document.querySelector('#path-filters').addEventListener('click', e => { const b=e.target.closest('[data-path]'); if(!b)return; state.activePath=b.dataset.path; state.showAll=false; document.querySelector('#show-all').setAttribute('aria-pressed','false'); document.querySelector('#show-all').textContent='显示全部节点'; document.querySelectorAll('[data-path]').forEach(x=>x.setAttribute('aria-pressed',x.dataset.path===state.activePath)); applyFilters(true); });
+    document.querySelector('#show-all').onclick = e => { state.showAll=!state.showAll; e.currentTarget.setAttribute('aria-pressed',String(state.showAll)); e.currentTarget.textContent=state.showAll?'收起旁路节点':'显示全部节点'; applyFilters(true); };
     document.querySelector('#fit').onclick = fit;
     document.querySelector('#legend-toggle').onclick = e => { const hidden=!document.querySelector('#legend').hidden; document.querySelector('#legend').hidden=hidden; e.currentTarget.setAttribute('aria-pressed',String(!hidden)); };
     document.querySelector('#close-detail').onclick = () => selectNode(null);
   }
 
   function basePathNodes(path) {
-    const ids = new Set(['cloud-resident','address','phone','itin','repay','c1','five24']);
+    const ids = new Set(['cloud-resident','address','phone','itin','repay','c1','five24','equifax','tu','ex']);
     state.data.nodes.forEach(n => { if (n.paths?.includes(path)) ids.add(n.id); });
     state.data.edges.forEach(e => { if (e.paths?.includes(path)) { ids.add(sourceId(e)); ids.add(targetId(e)); } });
     return ids;
   }
   function applyFilters(refit=false) {
-    const pathIds = state.activePath ? basePathNodes(state.activePath) : null;
-    state.nodes = state.data.nodes.filter(n => state.stages.has(n.stage) && (!pathIds || pathIds.has(n.id)));
+    const pathIds = basePathNodes(state.activePath || 'p1');
+    state.nodes = state.data.nodes.filter(n => state.stages.has(n.stage) && (state.showAll || pathIds.has(n.id)));
     const ids = new Set(state.nodes.map(n=>n.id));
-    state.edges = state.data.edges.filter(e => state.kinds.has(e.kind) && ids.has(sourceId(e)) && ids.has(targetId(e)) && (!state.activePath || !e.paths || e.paths.includes(state.activePath) || ['requires','blocks','monitors'].includes(e.kind)));
-    document.querySelector('#graph-status').textContent = `${state.nodes.length} 节点 · ${state.edges.length} 关系${state.activePath ? ' · '+PATHS[state.activePath] : ''}`;
+    state.edges = state.data.edges.filter(e => state.kinds.has(e.kind) && ids.has(sourceId(e)) && ids.has(targetId(e)) && (state.showAll || !e.paths || e.paths.includes(state.activePath) || ['requires','blocks','monitors'].includes(e.kind)));
+    document.querySelector('#graph-status').textContent = `${state.nodes.length} 节点 · ${state.edges.length} 关系 · ${state.showAll?'全部节点':PATHS[state.activePath]}`;
     if (state.selected && !ids.has(state.selected.id)) selectNode(null);
-    state.running=false; state.dirty=true; if(refit) setTimeout(()=>{fit();draw();},40);
+    state.running=false; state.dirty=true; if(refit){seedPositions();setTimeout(()=>{fit();draw();},40)}
   }
 
   function seedPositions() {
-    const columns={infra:0,icebreak:1,amex:2,chase:3,flagship:4};
-    const groups={}; state.data.nodes.forEach(n=>(groups[n.stage]??=[]).push(n));
-    Object.entries(groups).forEach(([stage,nodes])=>nodes.forEach((n,i)=>{
-      if(stage==='monitor'){n.x=500+i*230;n.y=430;}
-      else if(stage==='side'){n.x=40+(i%4)*275;n.y=i<4?-430:610;}
-      else {n.x=(columns[stage]||0)*260;n.y=(i-(nodes.length-1)/2)*112;}
-      n.targetY=n.y;n.vx=0;n.vy=0;
-    }));
+    const horizontal={
+      'cloud-resident':[-850,-220],'address':[-720,0],'phone':[-480,-190],'itin':[-480,0],'repay':[-240,190],
+      'c1':[-240,0],'hilton':[20,0],'green':[270,0],'chase-hotel':[540,0],'venturex':[800,0],'five24':[540,-190],
+      'savor':[20,190],'aspire':[280,190],'gold':[20,310],'csp':[280,310],'platinum':[540,310],
+      'bilt':[270,-190],'apple':[540,-310],'gt':[-240,-310],'au':[-480,190],
+      'equifax':[160,500],'tu':[410,500],'ex':[660,500],
+      'bad-address':[-660,500],'sofi':[900,270],'rakuten':[900,390],'kraken':[900,510]
+    };
+    const vertical={
+      'cloud-resident':[-230,-440],'address':[0,-320],'phone':[-230,-200],'itin':[0,-180],'repay':[-230,-40],
+      'c1':[0,-40],'hilton':[0,100],'green':[0,240],'chase-hotel':[0,380],'venturex':[0,520],'five24':[360,380],
+      'savor':[360,100],'aspire':[360,240],'gold':[780,100],'csp':[780,240],'platinum':[780,520],
+      'bilt':[-420,240],'apple':[-420,380],'gt':[-420,100],'au':[-420,-40],
+      'equifax':[-300,680],'tu':[0,680],'ex':[300,680],
+      'bad-address':[-800,520],'sofi':[1120,400],'rakuten':[1120,520],'kraken':[1120,640]
+    };
+    state.vertical=wrap.getBoundingClientRect().width<720;
+    const fixed=state.vertical?vertical:horizontal;
+    state.data.nodes.forEach((n,i)=>{const p=fixed[n.id]||[state.vertical?300:900,900+i*80];n.x=p[0];n.y=p[1];n.targetY=n.y;n.vx=0;n.vy=0;});
   }
 
   function simulate() {
@@ -83,15 +96,49 @@
   }
   function connected(id){const s=new Set([id]);state.edges.forEach(e=>{if(sourceId(e)===id)s.add(targetId(e));if(targetId(e)===id)s.add(sourceId(e));});return s}
 
+  function labelWidth(title){
+    const units=Array.from(title).reduce((sum,ch)=>sum+(ch.charCodeAt(0)>255?20:11.5),0);
+    return Math.max(250,Math.min(380,units+58));
+  }
+
+  function traceEdge(a,b,e){
+    const horizontal=Math.abs(b.x-a.x)>=Math.abs(b.y-a.y)*.8;
+    ctx.beginPath();
+    if(horizontal){
+      const dir=b.x>=a.x?1:-1, sx=a.x+dir*a._w/2, ex=b.x-dir*b._w/2, mid=(sx+ex)/2;
+      ctx.moveTo(sx,a.y);ctx.lineTo(mid,a.y);ctx.lineTo(mid,b.y);ctx.lineTo(ex,b.y);
+      return {x:ex,y:b.y,angle:dir>0?0:Math.PI};
+    }
+    const dir=b.y>=a.y?1:-1, sy=a.y+dir*a._h/2, ey=b.y-dir*b._h/2, mid=(sy+ey)/2;
+    ctx.moveTo(a.x,sy);ctx.lineTo(a.x,mid);ctx.lineTo(b.x,mid);ctx.lineTo(b.x,ey);
+    return {x:b.x,y:ey,angle:dir>0?Math.PI/2:-Math.PI/2};
+  }
+
   function draw() {
     ctx.clearRect(0,0,state.width,state.height);
     const focus=state.selected?connected(state.selected.id):null;
     ctx.save();ctx.translate(state.width/2+state.tx,state.height/2+state.ty);ctx.scale(state.scale,state.scale);
-    state.hoveredEdge=null;
-    state.edges.forEach(e=>{const a=state.data.nodeMap.get(sourceId(e)),b=state.data.nodeMap.get(targetId(e));if(!a||!b)return;const faded=focus&&!focus.has(a.id)&&!focus.has(b.id);ctx.globalAlpha=faded?.18:.68;ctx.strokeStyle=KINDS[e.kind][1];ctx.fillStyle=KINDS[e.kind][1];ctx.lineWidth=(e.kind==='blocks'?2.2:1.3)/state.scale;ctx.setLineDash(e.kind==='optional'?[7/state.scale,5/state.scale]:e.kind==='monitors'?[2/state.scale,5/state.scale]:[]);ctx.beginPath();ctx.moveTo(a.x,a.y);ctx.lineTo(b.x,b.y);ctx.stroke();ctx.setLineDash([]);if(['next','requires','blocks'].includes(e.kind)){const ang=Math.atan2(b.y-a.y,b.x-a.x),len=8/state.scale,px=b.x-Math.cos(ang)*55,py=b.y-Math.sin(ang)*18;ctx.beginPath();ctx.moveTo(px,py);ctx.lineTo(px-Math.cos(ang-.55)*len,py-Math.sin(ang-.55)*len);ctx.lineTo(px-Math.cos(ang+.55)*len,py-Math.sin(ang+.55)*len);ctx.closePath();ctx.fill();}if(e.kind==='stacks'){ctx.beginPath();ctx.moveTo(a.x,a.y+4/state.scale);ctx.lineTo(b.x,b.y+4/state.scale);ctx.stroke();}});
-    state.nodes.forEach(n=>{const w=Math.max(118,Math.min(190,n.title.length*15+42)),h=46;n._w=w;n._h=h;const faded=(focus&&!focus.has(n.id))||n._match===false;ctx.globalAlpha=faded?.2:1;ctx.shadowColor=stageColor(n.stage);ctx.shadowBlur=(state.selected===n?20:state.hovered===n?12:0)/state.scale;roundedRect(n.x-w/2,n.y-h/2,w,h,9);ctx.fillStyle='#172131';ctx.fill();ctx.lineWidth=(state.selected===n?3:state.hovered===n?2:1.25)/state.scale;ctx.strokeStyle=stageColor(n.stage);ctx.stroke();ctx.shadowBlur=0;ctx.fillStyle='#e7ecf3';ctx.font=`700 ${Math.max(11,14/state.scale)}px Inter, sans-serif`;ctx.textAlign='center';ctx.textBaseline='middle';ctx.fillText(n.title,n.x,n.y);if(['infra','icebreak','amex','chase','flagship'].includes(n.stage)){ctx.fillStyle=stageColor(n.stage);ctx.fillRect(n.x-w/2,n.y-h/2,5/state.scale,h);}});
+    state.nodes.forEach(n=>{n._w=labelWidth(n.title);n._h=50;});
+    state.edges.forEach(e=>{
+      const a=state.data.nodeMap.get(sourceId(e)),b=state.data.nodeMap.get(targetId(e));if(!a||!b)return;
+      const directlySelected=!focus||((a.id===state.selected?.id||b.id===state.selected?.id));
+      ctx.globalAlpha=focus?(directlySelected?.92:.15):.62;ctx.strokeStyle=KINDS[e.kind][1];ctx.fillStyle=KINDS[e.kind][1];ctx.lineWidth=(e.kind==='blocks'?2.8:MAIN_PATH.has(a.id)&&MAIN_PATH.has(b.id)?2.25:1.35)/state.scale;
+      ctx.setLineDash(e.kind==='optional'?[8/state.scale,6/state.scale]:e.kind==='monitors'?[2/state.scale,6/state.scale]:[]);
+      const end=traceEdge(a,b,e);ctx.stroke();ctx.setLineDash([]);
+      if(['next','requires','blocks'].includes(e.kind)){const len=9/state.scale;ctx.beginPath();ctx.moveTo(end.x,end.y);ctx.lineTo(end.x-Math.cos(end.angle-.52)*len,end.y-Math.sin(end.angle-.52)*len);ctx.lineTo(end.x-Math.cos(end.angle+.52)*len,end.y-Math.sin(end.angle+.52)*len);ctx.closePath();ctx.fill();}
+      if(e.kind==='stacks'){ctx.save();ctx.translate(0,5/state.scale);traceEdge(a,b,e);ctx.stroke();ctx.restore();}
+    });
+    state.nodes.forEach(n=>{
+      const w=n._w,h=n._h,isMain=MAIN_PATH.has(n.id),isSecondary=n.stage==='side'||n.stage==='monitor';
+      const faded=(focus&&!focus.has(n.id))||n._match===false;
+      ctx.globalAlpha=faded ? .22 : ((isSecondary&&state.selected!==n) ? .62 : 1);
+      ctx.shadowColor=stageColor(n.stage);ctx.shadowBlur=(state.selected===n?22:state.hovered===n?12:0)/state.scale;
+      roundedRect(n.x-w/2,n.y-h/2,w,h,9);ctx.fillStyle=isMain?'#203147':'#172131';ctx.fill();
+      ctx.lineWidth=(state.selected===n?3.4:isMain?2.6:state.hovered===n?2:1.25)/state.scale;ctx.strokeStyle=stageColor(n.stage);ctx.stroke();ctx.shadowBlur=0;
+      ctx.fillStyle='#e7ecf3';ctx.font=`700 ${Math.max(11,13/state.scale)}px Inter, sans-serif`;ctx.textAlign='center';ctx.textBaseline='middle';ctx.fillText(n.title,n.x,n.y);
+      if(!isSecondary){ctx.fillStyle=stageColor(n.stage);ctx.fillRect(n.x-w/2,n.y-h/2,5/state.scale,h);}
+    });
     ctx.restore();ctx.globalAlpha=1;
-    if(state.hoveredEdge){ const e=state.hoveredEdge; }
   }
   function frame(){if(state.running)simulate();if(state.dirty){draw();state.dirty=false}}
 
@@ -104,14 +151,14 @@
   canvas.addEventListener('dblclick',ev=>{const p=coords(ev),n=findNode(p.x,p.y);if(n)centerOn(n,true)});
   canvas.addEventListener('wheel',ev=>{ev.preventDefault();const p=coords(ev),before=screenToWorld(p.x,p.y),next=Math.max(.42,Math.min(2.2,state.scale*Math.exp(-ev.deltaY*.001)));state.scale=next;state.tx=p.x-state.width/2-before.x*next;state.ty=p.y-state.height/2-before.y*next;state.dirty=true},{passive:false});
 
-  function fit(){if(!state.nodes.length)return;const xs=state.nodes.map(n=>n.x),ys=state.nodes.map(n=>n.y),w=Math.max(...xs)-Math.min(...xs)+260,h=Math.max(...ys)-Math.min(...ys)+180;state.scale=Math.max(.42,Math.min(1,Math.min(state.width/w,state.height/h)));state.tx=-(Math.max(...xs)+Math.min(...xs))/2*state.scale;state.ty=-(Math.max(...ys)+Math.min(...ys))/2*state.scale;state.dirty=true}
+  function fit(){if(!state.nodes.length)return;state.nodes.forEach(n=>{n._w=labelWidth(n.title);n._h=50});const minX=Math.min(...state.nodes.map(n=>n.x-n._w/2)),maxX=Math.max(...state.nodes.map(n=>n.x+n._w/2)),minY=Math.min(...state.nodes.map(n=>n.y-n._h/2)),maxY=Math.max(...state.nodes.map(n=>n.y+n._h/2));const w=maxX-minX+100,h=maxY-minY+110;state.scale=Math.max(state.vertical?.43:.5,Math.min(1,Math.min(state.width/w,state.height/h)));state.tx=-(maxX+minX)/2*state.scale;state.ty=-(maxY+minY)/2*state.scale;state.dirty=true}
   function centerOn(n,zoom=false){state.scale=zoom?Math.max(state.scale,1.15):state.scale;state.tx=-n.x*state.scale;state.ty=-n.y*state.scale;state.dirty=true}
 
   function relationHTML(n,direction){const rows=state.data.edges.filter(e=>direction==='up'?targetId(e)===n.id:sourceId(e)===n.id);if(!rows.length)return'';return `<div class="relations"><h3>${direction==='up'?'上游':'下游'}</h3><div class="rel-list">${rows.map(e=>{const id=direction==='up'?sourceId(e):targetId(e),other=state.data.nodeMap.get(id);return `<button class="rel-btn" type="button" data-node="${id}">${esc(KINDS[e.kind][0])} · ${esc(other.title)}</button>`}).join('')}</div></div>`}
   function selectNode(n,push=true){state.selected=n;detail.classList.toggle('has-selection',!!n);if(n){document.querySelector('#side-note').textContent=n.stage==='side'?'非主路径 / OPTIONAL':'NODE DETAIL';document.querySelector('#detail-title').textContent=n.title;document.querySelector('#detail-tags').innerHTML=`<span class="tag stage" style="--stage:${stageColor(n.stage)}">${STAGES[n.stage][0]}</span>${(n.paths||[]).map(p=>`<span class="tag">${PATHS[p]}</span>`).join('')}`;document.querySelector('#detail-body').innerHTML=`${n.timing?`<div class="timing"><strong>建议时机</strong><br>${esc(n.timing)}</div>`:''}<p class="summary">${esc(n.summary)}</p><div class="copy">${n.body.map(p=>`<p>${esc(p)}</p>`).join('')}</div>${n.pitfalls?.length?`<div class="warning"><strong>注意</strong><ul>${n.pitfalls.map(p=>`<li>${esc(p)}</li>`).join('')}</ul></div>`:''}${relationHTML(n,'up')}${relationHTML(n,'down')}`;document.querySelectorAll('[data-node]').forEach(b=>b.onclick=()=>selectNode(state.data.nodeMap.get(b.dataset.node)));if(push){const u=new URL(location.href);u.searchParams.set('node',n.id);history.replaceState(null,'',u);}centerOn(n,false);}else if(push){const u=new URL(location.href);u.searchParams.delete('node');history.replaceState(null,'',u);}state.dirty=true}
 
-  function setupSearch(){const input=document.querySelector('#search');input.addEventListener('input',()=>{const q=input.value.trim().toLowerCase();state.nodes.forEach(n=>n._match=!q||[n.title,...(n.aliases||[])].join(' ').toLowerCase().includes(q));const first=state.nodes.find(n=>n._match);if(q&&first){state.hovered=first;centerOn(first,false)}state.dirty=true});input.addEventListener('keydown',e=>{if(e.key==='Enter'){const q=input.value.trim().toLowerCase(),n=state.nodes.find(n=>[n.title,...(n.aliases||[])].join(' ').toLowerCase().includes(q));if(n)selectNode(n);}});addEventListener('keydown',e=>{if(e.key==='/'&&!/input|textarea/i.test(document.activeElement.tagName)){e.preventDefault();input.focus()}if(e.key==='Escape'){input.value='';state.hovered=null;selectNode(null);}})}
+  function setupSearch(){const input=document.querySelector('#search');input.addEventListener('input',()=>{const q=input.value.trim().toLowerCase();state.nodes.forEach(n=>n._match=!q||[n.title,...(n.aliases||[])].join(' ').toLowerCase().includes(q));const first=state.nodes.find(n=>n._match);if(q&&first){state.hovered=first;centerOn(first,false)}state.dirty=true});input.addEventListener('keydown',e=>{if(e.key==='Enter'){const q=input.value.trim().toLowerCase(),n=state.data.nodes.find(n=>[n.title,...(n.aliases||[])].join(' ').toLowerCase().includes(q));if(n){if(!state.nodes.includes(n)){state.showAll=true;document.querySelector('#show-all').setAttribute('aria-pressed','true');document.querySelector('#show-all').textContent='收起旁路节点';applyFilters(true)}selectNode(n);}}});addEventListener('keydown',e=>{if(e.key==='/'&&!/input|textarea/i.test(document.activeElement.tagName)){e.preventDefault();input.focus()}if(e.key==='Escape'){input.value='';state.nodes.forEach(n=>n._match=true);state.hovered=null;selectNode(null);}})}
 
-  async function init(){initControls();setupSearch();try{const data=await fetch('graph.json').then(r=>{if(!r.ok)throw Error('graph');return r.json()});data.nodeMap=new Map(data.nodes.map(n=>[n.id,n]));state.data=data;seedPositions();applyFilters();resize();fit();draw();const id=new URLSearchParams(location.search).get('node');if(id&&data.nodeMap.has(id))selectNode(data.nodeMap.get(id),false);new ResizeObserver(()=>{resize();fit();draw();}).observe(wrap);setInterval(frame,33);}catch(err){document.querySelector('#graph-status').textContent='图谱载入失败，请刷新重试';console.error(err)}}
+  async function init(){initControls();setupSearch();try{const data=await fetch('graph.json').then(r=>{if(!r.ok)throw Error('graph');return r.json()});data.nodeMap=new Map(data.nodes.map(n=>[n.id,n]));state.data=data;seedPositions();applyFilters();resize();fit();draw();const id=new URLSearchParams(location.search).get('node');if(id&&data.nodeMap.has(id)){const n=data.nodeMap.get(id);if(!state.nodes.includes(n)){state.showAll=true;document.querySelector('#show-all').setAttribute('aria-pressed','true');document.querySelector('#show-all').textContent='收起旁路节点';applyFilters(true)}selectNode(n,false)}new ResizeObserver(()=>{const wasVertical=state.vertical;resize();if(wasVertical!==(wrap.getBoundingClientRect().width<720))seedPositions();fit();draw();}).observe(wrap);setInterval(frame,33);}catch(err){document.querySelector('#graph-status').textContent='图谱载入失败，请刷新重试';console.error(err)}}
   init();
 })();
