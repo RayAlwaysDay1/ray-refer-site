@@ -168,6 +168,19 @@
     .route-guide:hover { border-color: var(--route-color); background: color-mix(in srgb, var(--route-color) 13%, transparent); transform: translateY(-1px); }
     .route-guide:focus-visible { outline: 2px solid var(--route-color); outline-offset: 3px; }
     .route-note { margin-top: 20px; padding-top: 18px; border-top: 1px solid var(--line); color: #758196; font-size: .76rem; }
+    .graph-teaser { min-height: 360px; position: relative; padding: 26px; display: flex; flex-direction: column; justify-content: space-between; border: 1px solid rgba(116,247,255,.24); background: radial-gradient(circle at 62% 44%, rgba(116,247,255,.09), transparent 34%), #0b111a; overflow: hidden; }
+    .graph-nodes { position: absolute; inset: 0; opacity: .9; pointer-events: none; }
+    .graph-node { position: absolute; padding: 6px 9px; border: 1px solid var(--node); background: #111a27; color: #dfe8f5; font-size: .65rem; box-shadow: 0 0 18px color-mix(in srgb, var(--node) 15%, transparent); }
+    .graph-node::before { content: ""; position: absolute; width: var(--line-w, 74px); height: 1px; right: 100%; top: 50%; background: linear-gradient(90deg, transparent, var(--node)); transform: rotate(var(--line-r, 0deg)); transform-origin: right center; }
+    .graph-node.n1 { --node:#7dd3fc; left:8%; top:42%; }
+    .graph-node.n2 { --node:#86efac; --line-w:58px; left:36%; top:22%; }
+    .graph-node.n3 { --node:#fcd34d; --line-w:62px; --line-r:22deg; left:58%; top:45%; }
+    .graph-node.n4 { --node:#93c5fd; --line-w:70px; --line-r:-18deg; right:9%; top:24%; }
+    .graph-node.n5 { --node:#f9a8d4; --line-w:70px; --line-r:24deg; right:8%; bottom:21%; }
+    .graph-copy { position: relative; z-index: 2; max-width: 31ch; margin-top: auto; padding-top: 170px; }
+    .graph-copy p { margin: 0 0 18px; color: #aab6c8; font-family: Inter, ui-sans-serif, sans-serif; font-size: .91rem; }
+    .graph-launch { min-height: 48px; padding: 0 15px; display: inline-flex; align-items: center; justify-content: center; border: 1px solid var(--cyan); background: var(--cyan); color: #061013; font-size: .76rem; font-weight: 800; letter-spacing: .08em; text-transform: uppercase; transition: transform .2s ease, box-shadow .2s ease; }
+    .graph-launch:hover { transform: translateY(-2px); box-shadow: 0 12px 34px rgba(116,247,255,.15); }
 
     .refer-toolbar { margin-bottom: 14px; display: grid; grid-template-columns: 1fr auto; gap: 14px; align-items: center; }
     .search-wrap { position: relative; }
@@ -348,17 +361,15 @@
 
     <section id="roadmap" class="shell reveal">
       <div class="section-head"><span class="section-index">01 // ROADMAP</span><h2>从身份基建，<br>升级到<em>信用入口。</em></h2></div>
-      <p class="map-intro">一张面向中国用户的港卡 / 美卡进阶地图。先搭好号码、身份和地址，再逐步进入银行账户与信用体系。</p>
+      <p class="map-intro">美卡部分已升级为可交互知识图谱：从身份基建到首卡、Amex、Chase 与旗舰卡，也把监控、返利和高风险节点放进同一张图。</p>
       <div class="map-grid" aria-label="港卡与美卡升级地图">
         <article class="route-panel us">
-          <div class="route-head"><div><span class="route-kicker">United States track</span><h3>美卡升级路线</h3></div><span class="route-code" aria-hidden="true">US</span></div>
-          <ol class="route-steps">
-            <li class="route-step"><strong>建立美区数字身份</strong><p>先准备稳定的美国联系方式、税务身份与可收信地址。</p><div class="route-tags"><span class="route-tag">Tello 电话卡</span><span class="route-tag">美区 Apple ID</span><span class="route-tag">ITIN</span><span class="route-tag">ATMB 美国地址</span></div></li>
-            <li class="route-step"><strong>申请入门信用卡</strong><p>身份与地址信息稳定后，尝试进入美国信用体系。</p><div class="route-tags"><span class="route-tag">Capital One</span><span class="route-tag">Discover</span></div></li>
-            <li class="route-step"><strong>收卡并转寄回国</strong><p>卡片寄到美国地址后，通过可靠渠道完成合并与国际转寄。</p><div class="route-tags"><span class="route-tag">ATMB 收件</span><span class="route-tag">转寄中国</span></div></li>
-            <li class="route-step"><strong>激活并建立信用档案</strong><p>完成卡片激活和首次使用，逐步让 Equifax 等征信机构形成信用记录。</p><div class="route-tags"><span class="route-tag">Card Activation</span><span class="route-tag">Equifax</span></div></li>
-          </ol>
-          <div class="route-note">申请结果取决于银行审核、身份资料与个人信用情况。</div>
+          <div class="route-head"><div><span class="route-kicker">United States track</span><h3>美卡之路 · 知识图谱</h3></div><span class="route-code" aria-hidden="true">US</span></div>
+          <div class="graph-teaser">
+            <div class="graph-nodes" aria-hidden="true"><span class="graph-node n1">美国住宅地址</span><span class="graph-node n2">ITIN</span><span class="graph-node n3">Capital One</span><span class="graph-node n4">Chase 5/24</span><span class="graph-node n5">旗舰卡</span></div>
+            <div class="graph-copy"><p>27 个节点、31 条关系。查看五种申卡顺序，理解必经基建、信用监控、返利叠加与地址风险。</p><a class="graph-launch" href="credit-map/">打开交互图谱</a></div>
+          </div>
+          <div class="route-note">可拖拽、缩放、搜索与筛选；节点详情会显示上下游关系和常见坑。</div>
         </article>
 
         <article class="route-panel hk">
