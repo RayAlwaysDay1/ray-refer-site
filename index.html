@@ -71,8 +71,8 @@
       min-height: calc(100svh - 72px);
       padding: 72px 0 64px;
       display: grid;
-      grid-template-columns: minmax(0, 1.25fr) minmax(330px, .75fr);
-      gap: clamp(38px, 7vw, 92px);
+      grid-template-columns: minmax(0, 1.08fr) minmax(430px, .92fr);
+      gap: clamp(38px, 5vw, 72px);
       align-items: center;
     }
     .system-label { color: var(--cyan); font-size: .78rem; letter-spacing: .18em; text-transform: uppercase; }
@@ -93,8 +93,6 @@
     .chip:first-child { color: var(--cyan); border-color: rgba(116,247,255,.35); }
     .intro { max-width: 670px; margin: 28px 0 0; color: #abb7ca; font-family: Inter, ui-sans-serif, sans-serif; font-size: clamp(.98rem, 1.6vw, 1.14rem); }
     .intro strong { display: block; margin-bottom: 9px; color: var(--text); font-size: 1.12em; font-weight: 650; }
-    .hero-topics { margin-top: 18px; display: flex; flex-wrap: wrap; gap: 7px 16px; color: var(--cyan); font-size: .72rem; letter-spacing: .1em; text-transform: uppercase; }
-    .hero-topics span:not(:last-child)::after { content: " /"; margin-left: 16px; color: #405169; }
     .intro-link { width: fit-content; margin-top: 12px; display: block; color: #9aa8bd; font-size: .72rem; letter-spacing: .08em; border-bottom: 1px solid rgba(154,168,189,.28); transition: color .2s ease, border-color .2s ease; }
     .intro-link:hover { color: var(--cyan); border-color: var(--cyan); }
     .hero-actions { margin-top: 30px; display: flex; flex-wrap: wrap; gap: 12px; }
@@ -117,24 +115,38 @@
 
     .identity-card {
       position: relative;
-      min-height: 520px;
+      aspect-ratio: 1.58;
       border: 1px solid var(--line);
-      background: var(--panel);
+      border-radius: 22px;
+      background: linear-gradient(145deg, rgba(18,25,37,.94), rgba(7,10,16,.88));
       backdrop-filter: blur(18px);
       overflow: hidden;
       box-shadow: 0 28px 90px rgba(0,0,0,.42);
+      isolation: isolate;
     }
-    .identity-card::before { content: ""; position: absolute; inset: 0; background: url("hero-abstract.png") center / cover no-repeat; opacity: .24; mix-blend-mode: screen; filter: saturate(.8) hue-rotate(120deg); }
-    .identity-card::after { content: ""; position: absolute; inset: 0; border: 1px solid transparent; background: linear-gradient(135deg, rgba(116,247,255,.6), transparent 34%, transparent 70%, rgba(136,108,255,.45)) border-box; -webkit-mask: linear-gradient(#fff 0 0) padding-box, linear-gradient(#fff 0 0); -webkit-mask-composite: xor; pointer-events: none; }
-    .card-ui { position: relative; z-index: 2; min-height: 520px; padding: 26px; display: flex; flex-direction: column; justify-content: space-between; }
-    .card-head, .card-foot { display: flex; justify-content: space-between; align-items: center; color: var(--muted); font-size: .72rem; letter-spacing: .1em; text-transform: uppercase; }
-    .avatar-wrap { width: 210px; height: 210px; margin: auto; position: relative; display: grid; place-items: center; }
+    .identity-card::before { content: ""; position: absolute; inset: 0; background: url("hero-abstract.png") right center / 72% auto no-repeat; opacity: .18; mix-blend-mode: screen; filter: saturate(.75) hue-rotate(120deg); }
+    .identity-card::after { content: ""; position: absolute; inset: 0; border: 1px solid transparent; border-radius: inherit; background: linear-gradient(135deg, rgba(116,247,255,.68), transparent 34%, transparent 70%, rgba(136,108,255,.46)) border-box; -webkit-mask: linear-gradient(#fff 0 0) padding-box, linear-gradient(#fff 0 0); -webkit-mask-composite: xor; pointer-events: none; }
+    .card-ui { position: relative; z-index: 2; height: 100%; padding: 24px; display: grid; grid-template-rows: auto 1fr auto; gap: 18px; }
+    .card-head, .card-foot { display: flex; justify-content: space-between; align-items: center; color: var(--muted); font-size: .66rem; letter-spacing: .11em; text-transform: uppercase; }
+    .id-status { display: inline-flex; align-items: center; gap: 7px; color: var(--cyan); }
+    .id-status::before { content: ""; width: 6px; height: 6px; border-radius: 50%; background: var(--cyan); box-shadow: 0 0 12px var(--cyan); }
+    .identity-main { min-width: 0; display: grid; grid-template-columns: 116px minmax(0, 1fr); gap: 22px; align-items: center; }
+    .avatar-wrap { width: 108px; height: 108px; position: relative; display: grid; place-items: center; }
     .avatar-wrap::before, .avatar-wrap::after { content: ""; position: absolute; border-radius: 50%; border: 1px solid rgba(116,247,255,.42); }
-    .avatar-wrap::before { inset: -20px; animation: spin 12s linear infinite; border-top-color: transparent; border-bottom-color: var(--violet); }
-    .avatar-wrap::after { inset: -40px; border-color: rgba(136,108,255,.22); border-left-color: transparent; }
+    .avatar-wrap::before { inset: -8px; animation: spin 12s linear infinite; border-top-color: transparent; border-bottom-color: var(--violet); }
+    .avatar-wrap::after { inset: -15px; border-color: rgba(136,108,255,.22); border-left-color: transparent; }
     .avatar { width: 100%; height: 100%; object-fit: cover; border-radius: 50%; border: 3px solid rgba(238,244,255,.78); box-shadow: 0 0 55px rgba(116,247,255,.23); }
-    .handle { margin-top: 32px; text-align: center; font-size: 1.02rem; font-weight: 800; }
-    .handle small { display: block; margin-top: 4px; color: var(--cyan); font-weight: 500; font-size: .74rem; letter-spacing: .1em; }
+    .identity-copy { min-width: 0; }
+    .identity-type { color: var(--cyan); font-size: .65rem; letter-spacing: .14em; text-transform: uppercase; }
+    .handle { margin-top: 4px; font-family: Inter, ui-sans-serif, sans-serif; font-size: clamp(1.8rem, 3.2vw, 2.65rem); line-height: 1; font-weight: 800; letter-spacing: -.045em; }
+    .handle small { display: block; margin-top: 7px; color: #a6b3c7; font-family: ui-monospace, SFMono-Regular, Menlo, monospace; font-weight: 500; font-size: .67rem; letter-spacing: .08em; text-transform: uppercase; }
+    .access-grid { grid-column: 1 / -1; display: grid; grid-template-columns: repeat(5, minmax(0, 1fr)); gap: 7px; }
+    .access-node { min-width: 0; padding: 9px 7px 8px; border: 1px solid rgba(137,164,205,.18); background: rgba(5,9,14,.52); transition: transform .2s ease, border-color .2s ease, background .2s ease; }
+    .access-node:hover { transform: translateY(-2px); border-color: rgba(116,247,255,.46); background: rgba(116,247,255,.06); }
+    .access-node b { display: block; color: var(--cyan); font-size: .69rem; letter-spacing: .09em; }
+    .access-node span { display: block; margin-top: 3px; overflow: hidden; color: #8f9db2; font-size: .57rem; line-height: 1.25; white-space: nowrap; text-overflow: ellipsis; }
+    .card-foot a { color: #aebacf; transition: color .2s ease; }
+    .card-foot a:hover { color: var(--cyan); }
     @keyframes spin { to { transform: rotate(360deg); } }
 
     .ticker { border-top: 1px solid var(--line); border-bottom: 1px solid var(--line); overflow: hidden; background: rgba(10,14,21,.74); }
@@ -296,7 +308,7 @@
       .topnav { gap: 18px; }
       .hero { min-height: auto; grid-template-columns: 1fr; padding: 62px 0 74px; }
       h1 { font-size: clamp(4.8rem, 26vw, 8rem); }
-      .identity-card, .card-ui { min-height: 460px; }
+      .identity-card { width: min(100%, 620px); justify-self: center; }
       .section-head { grid-template-columns: 1fr; gap: 12px; margin-bottom: 38px; }
       .section-copy { margin: -16px 0 34px; }
       .map-intro { margin: -16px 0 34px; }
@@ -313,6 +325,12 @@
       .topnav .status { display: none; }
       .hero-actions { flex-direction: column; }
       .primary, .secondary { width: 100%; }
+      .identity-card { aspect-ratio: auto; min-height: 390px; border-radius: 18px; }
+      .card-ui { padding: 22px; gap: 20px; }
+      .identity-main { grid-template-columns: 96px minmax(0, 1fr); gap: 18px; }
+      .avatar-wrap { width: 88px; height: 88px; }
+      .access-grid { grid-template-columns: repeat(3, minmax(0, 1fr)); }
+      .access-node:nth-child(4), .access-node:nth-child(5) { grid-column: span 1; }
       .refer-toolbar { grid-template-columns: 1fr; }
       .result-count { text-align: left; }
       .card-actions { grid-template-columns: 1fr; }
@@ -341,8 +359,7 @@
         <div class="system-label">Profile initialized</div>
         <h1>Ray<span>.01</span></h1>
         <div class="role"><span class="chip">00 后产品经理</span><span class="chip">云居民</span><span class="chip">真实实操记录</span></div>
-        <p class="intro"><strong>在云端，搭建一套属于自己的全球金融生活。</strong>我是 Ray。这里分享港美卡、ITIN、跨境券商与支付工具的真实折腾，也记录开户、防风控、返现叠加和资金通道中的经验与踩坑。</p>
-        <div class="hero-topics" aria-label="Ray 分享的主题"><span>港美卡</span><span>出海基建</span><span>券商</span><span>被动收入</span></div>
+        <p class="intro"><strong>在云端，搭建一套属于自己的全球金融生活。</strong>我是 Ray，00 后产品经理与云居民。这里记录从身份基建到全球支付的真实实操，把复杂路径整理成可以直接行动的经验。</p>
         <a class="intro-link" href="https://x.com/RayAlwaysDay1/status/2109098959553896902?s=20" target="_blank" rel="noreferrer">阅读完整自我介绍 ↗</a>
         <div class="hero-actions">
           <a class="primary" href="https://x.com/RayAlwaysDay1" target="_blank" rel="noreferrer">Follow on X</a>
@@ -350,14 +367,21 @@
         </div>
       </div>
 
-      <aside class="identity-card" aria-label="Ray 的数字身份卡">
+      <aside class="identity-card" aria-label="Ray 的云居民数字身份卡">
         <div class="card-ui">
-          <div class="card-head"><span>Identity / 001</span><span>CN → Global</span></div>
-          <div>
+          <div class="card-head"><span>Cloud Resident ID</span><span class="id-status">Active</span></div>
+          <div class="identity-main">
             <div class="avatar-wrap"><img class="avatar" src="avatar.jpg" alt="Ray 的 X 头像"></div>
-            <div class="handle">RAY <small>@RayAlwaysDay1</small></div>
+            <div class="identity-copy"><span class="identity-type">Digital Infrastructure Builder</span><div class="handle">RAY <small>CN → Global · Product Manager</small></div></div>
+            <div class="access-grid" aria-label="云居民能力入口">
+              <a class="access-node" href="#roadmap"><b>HK</b><span>香港金融</span></a>
+              <a class="access-node" href="credit-map/"><b>US</b><span>美国信用</span></a>
+              <a class="access-node" href="#refer"><b>WEB3</b><span>加密货币</span></a>
+              <a class="access-node" href="#refer"><b>PAY</b><span>跨境支付</span></a>
+              <a class="access-node" href="#refer"><b>eSIM</b><span>全球通讯</span></a>
+            </div>
           </div>
-          <div class="card-foot"><span>Builder mindset</span><span>Est. 2023</span></div>
+          <div class="card-foot"><span>ID / RAY-001</span><a href="https://x.com/RayAlwaysDay1" target="_blank" rel="noreferrer">@RayAlwaysDay1 ↗</a></div>
         </div>
       </aside>
     </div>
