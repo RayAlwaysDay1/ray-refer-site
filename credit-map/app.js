@@ -4,8 +4,8 @@
     chase: ['Chase', '#93c5fd'], flagship: ['旗舰', '#f9a8d4'], monitor: ['监控', '#c4b5fd'], side: ['旁路', '#fdba74']
   };
   const KINDS = {
-    requires: ['依赖', '#7dd3fc'], next: ['顺序', '#86efac'], optional: ['可选', '#fdba74'],
-    blocks: ['阻断', '#fb7185'], monitors: ['监控', '#c4b5fd'], stacks: ['叠加', '#fcd34d']
+    requires: ['必须先准备', '#7dd3fc'], next: ['建议下一步', '#86efac'], optional: ['可选路线', '#fdba74'],
+    blocks: ['可能卡住', '#fb7185'], monitors: ['会被记录', '#c4b5fd'], stacks: ['可以叠加', '#fcd34d']
   };
   const PATHS = { p1: '路径一', p2: '路径二', p3: '路径三', p4: '路径四', p5: '路径五' };
   const stageOrder = Object.keys(STAGES), kindOrder = Object.keys(KINDS);
@@ -55,20 +55,20 @@
 
   function seedPositions() {
     const horizontal={
-      'cloud-resident':[-850,-220],'address':[-720,0],'phone':[-480,-190],'itin':[-480,0],'repay':[-240,190],
-      'c1':[-240,0],'hilton':[20,0],'green':[270,0],'chase-hotel':[540,0],'venturex':[800,0],'five24':[540,-190],
-      'savor':[20,190],'aspire':[280,190],'gold':[20,310],'csp':[280,310],'platinum':[540,310],
-      'bilt':[270,-190],'apple':[540,-310],'gt':[-240,-310],'au':[-480,190],
-      'equifax':[160,500],'tu':[410,500],'ex':[660,500],
-      'bad-address':[-660,500],'sofi':[900,270],'rakuten':[900,390],'kraken':[900,510]
+      'cloud-resident':[-1350,-220],'address':[-1050,0],'phone':[-1050,-220],'itin':[-700,0],'repay':[-350,220],
+      'c1':[-350,0],'hilton':[0,0],'green':[350,0],'chase-hotel':[700,0],'venturex':[1050,0],'five24':[700,-220],
+      'savor':[0,220],'aspire':[350,220],'gold':[0,360],'csp':[350,360],'platinum':[700,360],
+      'bilt':[350,-220],'apple':[700,-360],'gt':[-350,-360],'au':[-700,220],
+      'equifax':[220,560],'tu':[570,560],'ex':[920,560],
+      'bad-address':[-1050,560],'sofi':[1220,270],'rakuten':[1220,410],'kraken':[1220,550]
     };
     const vertical={
-      'cloud-resident':[-230,-440],'address':[0,-320],'phone':[-230,-200],'itin':[0,-180],'repay':[-230,-40],
-      'c1':[0,-40],'hilton':[0,100],'green':[0,240],'chase-hotel':[0,380],'venturex':[0,520],'five24':[360,380],
-      'savor':[360,100],'aspire':[360,240],'gold':[780,100],'csp':[780,240],'platinum':[780,520],
-      'bilt':[-420,240],'apple':[-420,380],'gt':[-420,100],'au':[-420,-40],
-      'equifax':[-300,680],'tu':[0,680],'ex':[300,680],
-      'bad-address':[-800,520],'sofi':[1120,400],'rakuten':[1120,520],'kraken':[1120,640]
+      'cloud-resident':[-360,-600],'address':[0,-480],'phone':[-360,-300],'itin':[0,-300],'repay':[-360,-120],
+      'c1':[0,-120],'hilton':[0,60],'green':[0,240],'chase-hotel':[0,420],'venturex':[0,600],'five24':[400,420],
+      'savor':[400,60],'aspire':[400,240],'gold':[800,60],'csp':[800,240],'platinum':[800,600],
+      'bilt':[-440,240],'apple':[-440,420],'gt':[-440,60],'au':[-440,-120],
+      'equifax':[-340,840],'tu':[0,840],'ex':[340,840],
+      'bad-address':[-850,600],'sofi':[1220,420],'rakuten':[1220,600],'kraken':[1220,780]
     };
     state.vertical=wrap.getBoundingClientRect().width<720;
     const fixed=state.vertical?vertical:horizontal;
@@ -107,11 +107,18 @@
     if(horizontal){
       const dir=b.x>=a.x?1:-1, sx=a.x+dir*a._w/2, ex=b.x-dir*b._w/2, mid=(sx+ex)/2;
       ctx.moveTo(sx,a.y);ctx.lineTo(mid,a.y);ctx.lineTo(mid,b.y);ctx.lineTo(ex,b.y);
-      return {x:ex,y:b.y,angle:dir>0?0:Math.PI};
+      return {x:ex,y:b.y,angle:dir>0?0:Math.PI,labelX:mid,labelY:(a.y+b.y)/2};
     }
     const dir=b.y>=a.y?1:-1, sy=a.y+dir*a._h/2, ey=b.y-dir*b._h/2, mid=(sy+ey)/2;
     ctx.moveTo(a.x,sy);ctx.lineTo(a.x,mid);ctx.lineTo(b.x,mid);ctx.lineTo(b.x,ey);
-    return {x:b.x,y:ey,angle:dir>0?Math.PI/2:-Math.PI/2};
+    return {x:b.x,y:ey,angle:dir>0?Math.PI/2:-Math.PI/2,labelX:(a.x+b.x)/2,labelY:mid};
+  }
+
+  function drawEdgeLabel(e,end,emphasis){
+    const label=e.label||KINDS[e.kind][0],fontSize=10.5/state.scale,padX=6/state.scale,padY=4/state.scale;
+    ctx.save();ctx.font=`700 ${fontSize}px Inter, sans-serif`;const w=ctx.measureText(label).width+padX*2,h=fontSize+padY*2;
+    roundedRect(end.labelX-w/2,end.labelY-h/2,w,h,5/state.scale);ctx.fillStyle=emphasis?'rgba(15,20,25,.96)':'rgba(15,20,25,.84)';ctx.fill();
+    ctx.lineWidth=1/state.scale;ctx.strokeStyle=KINDS[e.kind][1];ctx.stroke();ctx.fillStyle='#dbe5f1';ctx.textAlign='center';ctx.textBaseline='middle';ctx.fillText(label,end.labelX,end.labelY+.4/state.scale);ctx.restore();
   }
 
   function draw() {
@@ -127,6 +134,8 @@
       const end=traceEdge(a,b,e);ctx.stroke();ctx.setLineDash([]);
       if(['next','requires','blocks'].includes(e.kind)){const len=9/state.scale;ctx.beginPath();ctx.moveTo(end.x,end.y);ctx.lineTo(end.x-Math.cos(end.angle-.52)*len,end.y-Math.sin(end.angle-.52)*len);ctx.lineTo(end.x-Math.cos(end.angle+.52)*len,end.y-Math.sin(end.angle+.52)*len);ctx.closePath();ctx.fill();}
       if(e.kind==='stacks'){ctx.save();ctx.translate(0,5/state.scale);traceEdge(a,b,e);ctx.stroke();ctx.restore();}
+      const isFocused=state.selected&&(a.id===state.selected.id||b.id===state.selected.id);
+      if(state.hoveredEdge===e)drawEdgeLabel(e,end,!!isFocused);
     });
     state.nodes.forEach(n=>{
       const w=n._w,h=n._h,isMain=MAIN_PATH.has(n.id),isSecondary=n.stage==='side'||n.stage==='monitor';
@@ -151,14 +160,15 @@
   canvas.addEventListener('dblclick',ev=>{const p=coords(ev),n=findNode(p.x,p.y);if(n)centerOn(n,true)});
   canvas.addEventListener('wheel',ev=>{ev.preventDefault();const p=coords(ev),before=screenToWorld(p.x,p.y),next=Math.max(.42,Math.min(2.2,state.scale*Math.exp(-ev.deltaY*.001)));state.scale=next;state.tx=p.x-state.width/2-before.x*next;state.ty=p.y-state.height/2-before.y*next;state.dirty=true},{passive:false});
 
-  function fit(){if(!state.nodes.length)return;state.nodes.forEach(n=>{n._w=labelWidth(n.title);n._h=50});const minX=Math.min(...state.nodes.map(n=>n.x-n._w/2)),maxX=Math.max(...state.nodes.map(n=>n.x+n._w/2)),minY=Math.min(...state.nodes.map(n=>n.y-n._h/2)),maxY=Math.max(...state.nodes.map(n=>n.y+n._h/2));const w=maxX-minX+100,h=maxY-minY+110;state.scale=Math.max(state.vertical?.43:.5,Math.min(1,Math.min(state.width/w,state.height/h)));state.tx=-(maxX+minX)/2*state.scale;state.ty=-(maxY+minY)/2*state.scale;state.dirty=true}
+  function fit(){if(!state.nodes.length)return;state.nodes.forEach(n=>{n._w=labelWidth(n.title);n._h=50});const minX=Math.min(...state.nodes.map(n=>n.x-n._w/2)),maxX=Math.max(...state.nodes.map(n=>n.x+n._w/2)),minY=Math.min(...state.nodes.map(n=>n.y-n._h/2)),maxY=Math.max(...state.nodes.map(n=>n.y+n._h/2));const w=maxX-minX+140,h=maxY-minY+150;state.scale=Math.max(state.vertical?.26:.32,Math.min(1,Math.min(state.width/w,state.height/h)));state.tx=-(maxX+minX)/2*state.scale;state.ty=-(maxY+minY)/2*state.scale;state.dirty=true}
   function centerOn(n,zoom=false){state.scale=zoom?Math.max(state.scale,1.15):state.scale;state.tx=-n.x*state.scale;state.ty=-n.y*state.scale;state.dirty=true}
 
-  function relationHTML(n,direction){const rows=state.data.edges.filter(e=>direction==='up'?targetId(e)===n.id:sourceId(e)===n.id);if(!rows.length)return'';return `<div class="relations"><h3>${direction==='up'?'上游':'下游'}</h3><div class="rel-list">${rows.map(e=>{const id=direction==='up'?sourceId(e):targetId(e),other=state.data.nodeMap.get(id);return `<button class="rel-btn" type="button" data-node="${id}">${esc(KINDS[e.kind][0])} · ${esc(other.title)}</button>`}).join('')}</div></div>`}
+  function relationSentence(e,other){const label=e.label?`：${e.label}`:'';const prefix={optional:'可选 · ',blocks:'风险 · ',monitors:'征信记录 · ',stacks:'可叠加 · '}[e.kind]||'';return `${prefix}${other.title}${label}`}
+  function relationHTML(n,direction){const rows=state.data.edges.filter(e=>direction==='up'?targetId(e)===n.id:sourceId(e)===n.id);if(!rows.length)return'';return `<div class="relations"><h3>${direction==='up'?'为什么会连到这里':'从这里还能去哪里'}</h3><div class="rel-list">${rows.map(e=>{const id=direction==='up'?sourceId(e):targetId(e),other=state.data.nodeMap.get(id);return `<button class="rel-btn" type="button" data-node="${id}"><span>${esc(relationSentence(e,other))}</span><i aria-hidden="true">→</i></button>`}).join('')}</div></div>`}
   function selectNode(n,push=true){state.selected=n;detail.classList.toggle('has-selection',!!n);if(n){document.querySelector('#side-note').textContent=n.stage==='side'?'非主路径 / OPTIONAL':'NODE DETAIL';document.querySelector('#detail-title').textContent=n.title;document.querySelector('#detail-tags').innerHTML=`<span class="tag stage" style="--stage:${stageColor(n.stage)}">${STAGES[n.stage][0]}</span>${(n.paths||[]).map(p=>`<span class="tag">${PATHS[p]}</span>`).join('')}`;const cardArt=n.cardImage?`<figure class="card-art"><div class="card-art-frame"><img src="${esc(n.cardImage)}" alt="${esc(n.cardImageAlt||`${n.title} 卡面`)}" loading="eager"></div><figcaption><span>Card Face · 卡面参考</span><span>${esc(n.cardImageCaption||n.title)}</span></figcaption></figure>`:'';document.querySelector('#detail-body').innerHTML=`${cardArt}${n.timing?`<div class="timing"><strong>建议时机</strong><br>${esc(n.timing)}</div>`:''}<p class="summary">${esc(n.summary)}</p><div class="copy">${n.body.map(p=>`<p>${esc(p)}</p>`).join('')}</div>${n.pitfalls?.length?`<div class="warning"><strong>注意</strong><ul>${n.pitfalls.map(p=>`<li>${esc(p)}</li>`).join('')}</ul></div>`:''}${relationHTML(n,'up')}${relationHTML(n,'down')}`;document.querySelectorAll('[data-node]').forEach(b=>b.onclick=()=>selectNode(state.data.nodeMap.get(b.dataset.node)));if(push){const u=new URL(location.href);u.searchParams.set('node',n.id);history.replaceState(null,'',u);}centerOn(n,false);}else if(push){const u=new URL(location.href);u.searchParams.delete('node');history.replaceState(null,'',u);}state.dirty=true}
 
   function setupSearch(){const input=document.querySelector('#search');input.addEventListener('input',()=>{const q=input.value.trim().toLowerCase();state.nodes.forEach(n=>n._match=!q||[n.title,...(n.aliases||[])].join(' ').toLowerCase().includes(q));const first=state.nodes.find(n=>n._match);if(q&&first){state.hovered=first;centerOn(first,false)}state.dirty=true});input.addEventListener('keydown',e=>{if(e.key==='Enter'){const q=input.value.trim().toLowerCase(),n=state.data.nodes.find(n=>[n.title,...(n.aliases||[])].join(' ').toLowerCase().includes(q));if(n){if(!state.nodes.includes(n)){state.showAll=true;document.querySelector('#show-all').setAttribute('aria-pressed','true');document.querySelector('#show-all').textContent='收起旁路节点';applyFilters(true)}selectNode(n);}}});addEventListener('keydown',e=>{if(e.key==='/'&&!/input|textarea/i.test(document.activeElement.tagName)){e.preventDefault();input.focus()}if(e.key==='Escape'){input.value='';state.nodes.forEach(n=>n._match=true);state.hovered=null;selectNode(null);}})}
 
-  async function init(){initControls();setupSearch();try{const data=await fetch('graph.json?v=20261010-cardart').then(r=>{if(!r.ok)throw Error('graph');return r.json()});data.nodeMap=new Map(data.nodes.map(n=>[n.id,n]));state.data=data;seedPositions();applyFilters();resize();fit();draw();const id=new URLSearchParams(location.search).get('node');if(id&&data.nodeMap.has(id)){const n=data.nodeMap.get(id);if(!state.nodes.includes(n)){state.showAll=true;document.querySelector('#show-all').setAttribute('aria-pressed','true');document.querySelector('#show-all').textContent='收起旁路节点';applyFilters(true)}selectNode(n,false)}new ResizeObserver(()=>{const wasVertical=state.vertical;resize();if(wasVertical!==(wrap.getBoundingClientRect().width<720))seedPositions();fit();draw();}).observe(wrap);setInterval(frame,33);}catch(err){document.querySelector('#graph-status').textContent='图谱载入失败，请刷新重试';console.error(err)}}
+  async function init(){initControls();setupSearch();try{const data=await fetch('graph.json?v=20261011-aligned-relations').then(r=>{if(!r.ok)throw Error('graph');return r.json()});data.nodeMap=new Map(data.nodes.map(n=>[n.id,n]));state.data=data;seedPositions();applyFilters();resize();fit();draw();const id=new URLSearchParams(location.search).get('node');if(id&&data.nodeMap.has(id)){const n=data.nodeMap.get(id);if(!state.nodes.includes(n)){state.showAll=true;document.querySelector('#show-all').setAttribute('aria-pressed','true');document.querySelector('#show-all').textContent='收起旁路节点';applyFilters(true)}selectNode(n,false)}new ResizeObserver(()=>{const wasVertical=state.vertical;resize();if(wasVertical!==(wrap.getBoundingClientRect().width<720))seedPositions();fit();draw();}).observe(wrap);setInterval(frame,33);}catch(err){document.querySelector('#graph-status').textContent='图谱载入失败，请刷新重试';console.error(err)}}
   init();
 })();

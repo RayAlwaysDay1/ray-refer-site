@@ -71,8 +71,8 @@
       min-height: calc(100svh - 72px);
       padding: 72px 0 64px;
       display: grid;
-      grid-template-columns: minmax(0, 1.08fr) minmax(430px, .92fr);
-      gap: clamp(38px, 5vw, 72px);
+      grid-template-columns: minmax(0, .92fr) minmax(500px, 1.08fr);
+      gap: clamp(32px, 4vw, 56px);
       align-items: center;
     }
     .system-label { color: var(--cyan); font-size: .78rem; letter-spacing: .18em; text-transform: uppercase; }
@@ -115,6 +115,9 @@
 
     .identity-card {
       position: relative;
+      width: 100%;
+      max-width: 650px;
+      justify-self: end;
       aspect-ratio: 1.58;
       border: 1px solid var(--line);
       border-radius: 22px;
@@ -126,12 +129,12 @@
     }
     .identity-card::before { content: ""; position: absolute; inset: 0; background: url("hero-abstract.png") right center / 72% auto no-repeat; opacity: .18; mix-blend-mode: screen; filter: saturate(.75) hue-rotate(120deg); }
     .identity-card::after { content: ""; position: absolute; inset: 0; border: 1px solid transparent; border-radius: inherit; background: linear-gradient(135deg, rgba(116,247,255,.68), transparent 34%, transparent 70%, rgba(136,108,255,.46)) border-box; -webkit-mask: linear-gradient(#fff 0 0) padding-box, linear-gradient(#fff 0 0); -webkit-mask-composite: xor; pointer-events: none; }
-    .card-ui { position: relative; z-index: 2; height: 100%; padding: 24px; display: grid; grid-template-rows: auto 1fr auto; gap: 18px; }
+    .card-ui { position: relative; z-index: 2; height: 100%; padding: 28px; display: grid; grid-template-rows: auto 1fr auto; gap: 20px; }
     .card-head, .card-foot { display: flex; justify-content: space-between; align-items: center; color: var(--muted); font-size: .66rem; letter-spacing: .11em; text-transform: uppercase; }
     .id-status { display: inline-flex; align-items: center; gap: 7px; color: var(--cyan); }
     .id-status::before { content: ""; width: 6px; height: 6px; border-radius: 50%; background: var(--cyan); box-shadow: 0 0 12px var(--cyan); }
-    .identity-main { min-width: 0; display: grid; grid-template-columns: 116px minmax(0, 1fr); gap: 22px; align-items: center; }
-    .avatar-wrap { width: 108px; height: 108px; position: relative; display: grid; place-items: center; }
+    .identity-main { min-width: 0; display: grid; grid-template-columns: 132px minmax(0, 1fr); gap: 26px; align-items: center; }
+    .avatar-wrap { width: 122px; height: 122px; position: relative; display: grid; place-items: center; }
     .avatar-wrap::before, .avatar-wrap::after { content: ""; position: absolute; border-radius: 50%; border: 1px solid rgba(116,247,255,.42); }
     .avatar-wrap::before { inset: -8px; animation: spin 12s linear infinite; border-top-color: transparent; border-bottom-color: var(--violet); }
     .avatar-wrap::after { inset: -15px; border-color: rgba(136,108,255,.22); border-left-color: transparent; }
@@ -141,7 +144,7 @@
     .handle { margin-top: 4px; font-family: Inter, ui-sans-serif, sans-serif; font-size: clamp(1.8rem, 3.2vw, 2.65rem); line-height: 1; font-weight: 800; letter-spacing: -.045em; }
     .handle small { display: block; margin-top: 7px; color: #a6b3c7; font-family: ui-monospace, SFMono-Regular, Menlo, monospace; font-weight: 500; font-size: .67rem; letter-spacing: .08em; text-transform: uppercase; }
     .access-grid { grid-column: 1 / -1; display: grid; grid-template-columns: repeat(5, minmax(0, 1fr)); gap: 7px; }
-    .access-node { min-width: 0; padding: 9px 7px 8px; border: 1px solid rgba(137,164,205,.18); background: rgba(5,9,14,.52); transition: transform .2s ease, border-color .2s ease, background .2s ease; }
+    .access-node { min-width: 0; padding: 11px 8px 10px; border: 1px solid rgba(137,164,205,.18); background: rgba(5,9,14,.52); transition: transform .2s ease, border-color .2s ease, background .2s ease; }
     .access-node:hover { transform: translateY(-2px); border-color: rgba(116,247,255,.46); background: rgba(116,247,255,.06); }
     .access-node b { display: block; color: var(--cyan); font-size: .69rem; letter-spacing: .09em; }
     .access-node span { display: block; margin-top: 3px; overflow: hidden; color: #8f9db2; font-size: .57rem; line-height: 1.25; white-space: nowrap; text-overflow: ellipsis; }
