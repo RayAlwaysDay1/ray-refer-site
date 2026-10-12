@@ -205,6 +205,8 @@
     .writing-head { margin: 0 0 15px; display: flex; align-items: center; justify-content: space-between; gap: 18px; }
     .writing-head strong { color: #aeb9ca; font-size: .72rem; letter-spacing: .11em; text-transform: uppercase; }
     .writing-head a { color: var(--cyan); font-size: .72rem; letter-spacing: .07em; }
+    .writing-head span { color: #748197; font-size: .68rem; letter-spacing: .06em; }
+    .popular-head { margin-top: 48px; }
     .post-grid { display: grid; grid-template-columns: 1fr; gap: 14px; }
     .post-card { min-height: 214px; position: relative; display: grid; grid-template-columns: 150px minmax(0, 1fr) 112px; align-items: stretch; border: 1px solid var(--line); background: linear-gradient(110deg, rgba(18,26,39,.92), rgba(9,14,22,.72)); overflow: hidden; transition: transform .22s ease, border-color .22s ease, box-shadow .22s ease; }
     .post-card::before { content: ""; position: absolute; inset: 0 auto 0 0; width: 2px; background: linear-gradient(180deg, var(--cyan), var(--violet)); opacity: .72; }
@@ -220,6 +222,9 @@
     .post-open { position: relative; z-index: 1; padding: 26px 18px; display: flex; flex-direction: column; align-items: center; justify-content: space-between; border-left: 1px solid var(--line); color: #b9c4d4; font-size: .63rem; letter-spacing: .09em; text-transform: uppercase; text-align: center; }
     .post-open b { color: var(--cyan); font-family: Inter, ui-sans-serif, sans-serif; font-size: 1.5rem; font-weight: 400; transition: transform .22s ease; }
     .post-card:hover .post-open b { transform: translate(3px, -3px); }
+    .popular-post::before { background: linear-gradient(180deg, #f3b6ff, #8b7dff); }
+    .popular-post .article-index, .popular-post .post-meta, .popular-post .post-open b { color: #f3b6ff; }
+    .popular-post:hover { border-color: rgba(243,182,255,.46); box-shadow: 0 22px 62px rgba(0,0,0,.34), 0 0 28px rgba(243,182,255,.05); }
 
     .refer-toolbar { margin-bottom: 14px; display: grid; grid-template-columns: 1fr auto; gap: 14px; align-items: center; }
     .search-wrap { position: relative; }
@@ -423,12 +428,19 @@
 
     <section id="writing" class="shell reveal">
       <div class="section-head"><span class="section-index">01 // WRITING</span><h2>我在写什么，<br><em>直接读原文。</em></h2></div>
-      <p class="section-copy">这里只展示我在 X 发布的长文章，标题与入口均直接来自原文。普通动态和活动提醒不混入这里。</p>
+      <p class="section-copy">这里展示我在 X 发布的长文章，以及公开互动较高的实用帖子。页面中的标题、文案和入口均直接来自原帖。</p>
       <div class="writing-head"><strong>3 篇 X 长文章 / Original articles</strong><a href="https://x.com/RayAlwaysDay1" target="_blank" rel="noreferrer">查看 X 主页 ↗</a></div>
       <div class="post-grid">
         <a class="post-card" href="https://x.com/RayAlwaysDay1/status/2105860519420936211?s=20" target="_blank" rel="noreferrer"><span class="article-index"><small>X Article</small><b>01</b></span><span class="article-copy"><span class="post-meta"><span>@RayAlwaysDay1</span><span>汇丰 Pulse</span></span><h3>内地学生申请汇丰Pulse指南｜被拒5—10次后，催了20天终于下卡</h3></span><span class="post-open"><span>阅读原文</span><b>↗</b></span></a>
         <a class="post-card" href="https://x.com/RayAlwaysDay1/status/2106398937439772987?s=20" target="_blank" rel="noreferrer"><span class="article-index"><small>X Article</small><b>02</b></span><span class="article-copy"><span class="post-meta"><span>@RayAlwaysDay1</span><span>信银 GBA</span></span><h3>内地学生申请信银GBA｜从失败被卡材料，到成功开户刷满奖励的真实经验</h3></span><span class="post-open"><span>阅读原文</span><b>↗</b></span></a>
         <a class="post-card" href="https://x.com/RayAlwaysDay1/status/2105476872884924483?s=20" target="_blank" rel="noreferrer"><span class="article-index"><small>X Article</small><b>03</b></span><span class="article-copy"><span class="post-meta"><span>@RayAlwaysDay1</span><span>Pirate Ship</span></span><h3>PirateShip海盗船折扣打单 最低26刀转运回国 UPS官方3折 Anytime Mailbox低价转运回国</h3></span><span class="post-open"><span>阅读原文</span><b>↗</b></span></a>
+      </div>
+      <div class="writing-head popular-head"><strong>4 条高赞帖子 / Popular posts</strong><span>公开数据读取于 2026.10.12</span></div>
+      <div class="post-grid">
+        <a class="post-card popular-post" href="https://x.com/RayAlwaysDay1/status/2109098959553896902?s=20" target="_blank" rel="noreferrer"><span class="article-index"><small>Popular Post</small><b>01</b></span><span class="article-copy"><span class="post-meta"><span>@RayAlwaysDay1</span><span>136 赞 · 1.2万浏览</span></span><h3>Hi 大家👋 我是Ray，00后云居民，主要分享港美卡、出海基建、券商与被动收入相关的真实折腾记录</h3></span><span class="post-open"><span>查看帖子</span><b>↗</b></span></a>
+        <a class="post-card popular-post" href="https://x.com/RayAlwaysDay1/status/2109281970056474712" target="_blank" rel="noreferrer"><span class="article-index"><small>Popular Post</small><b>02</b></span><span class="article-copy"><span class="post-meta"><span>@RayAlwaysDay1</span><span>30 赞 · 4825 浏览</span></span><h3>汇丰蓝狮子北上广深蓉地铁可享100%现金回赠</h3></span><span class="post-open"><span>查看帖子</span><b>↗</b></span></a>
+        <a class="post-card popular-post" href="https://x.com/RayAlwaysDay1/status/2107849812376981684?s=20" target="_blank" rel="noreferrer"><span class="article-index"><small>Popular Post</small><b>03</b></span><span class="article-copy"><span class="post-meta"><span>@RayAlwaysDay1</span><span>14 赞 · 3863 浏览</span></span><h3>美卡☁️居民返利平台推荐：Rakuten乐天</h3></span><span class="post-open"><span>查看帖子</span><b>↗</b></span></a>
+        <a class="post-card popular-post" href="https://x.com/RayAlwaysDay1/status/2107254450045981092?s=20" target="_blank" rel="noreferrer"><span class="article-index"><small>Popular Post</small><b>04</b></span><span class="article-copy"><span class="post-meta"><span>@RayAlwaysDay1</span><span>11 赞 · 5782 浏览</span></span><h3>CNID在线上申请汇丰香港账户，到港激活时，有如下没人告诉你的技巧</h3></span><span class="post-open"><span>查看帖子</span><b>↗</b></span></a>
       </div>
     </section>
 
