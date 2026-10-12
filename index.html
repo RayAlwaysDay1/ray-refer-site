@@ -222,9 +222,26 @@
     .post-open { position: relative; z-index: 1; padding: 26px 18px; display: flex; flex-direction: column; align-items: center; justify-content: space-between; border-left: 1px solid var(--line); color: #b9c4d4; font-size: .63rem; letter-spacing: .09em; text-transform: uppercase; text-align: center; }
     .post-open b { color: var(--cyan); font-family: Inter, ui-sans-serif, sans-serif; font-size: 1.5rem; font-weight: 400; transition: transform .22s ease; }
     .post-card:hover .post-open b { transform: translate(3px, -3px); }
-    .popular-post::before { background: linear-gradient(180deg, #f3b6ff, #8b7dff); }
-    .popular-post .article-index, .popular-post .post-meta, .popular-post .post-open b { color: #f3b6ff; }
-    .popular-post:hover { border-color: rgba(243,182,255,.46); box-shadow: 0 22px 62px rgba(0,0,0,.34), 0 0 28px rgba(243,182,255,.05); }
+    .post-card[hidden], .tweet-card[hidden] { display: none !important; }
+    .pager-controls { margin-top: 14px; display: flex; align-items: center; justify-content: flex-end; gap: 8px; }
+    .pager-button { width: 42px; height: 42px; display: grid; place-items: center; border: 1px solid var(--line); background: rgba(13,18,27,.72); color: var(--cyan); font: inherit; font-size: 1rem; cursor: pointer; transition: border-color .2s ease, background .2s ease, color .2s ease; }
+    .pager-button:hover:not(:disabled) { border-color: var(--cyan); background: rgba(116,247,255,.07); }
+    .pager-button:disabled { color: #566174; cursor: not-allowed; opacity: .55; }
+    .pager-status { min-width: 68px; color: #8996aa; font-size: .7rem; letter-spacing: .12em; text-align: center; }
+    .tweet-list { display: grid; grid-template-columns: 1fr; gap: 12px; }
+    .tweet-card { position: relative; padding: 22px 24px; display: grid; grid-template-columns: 50px minmax(0, 1fr); gap: 15px; border: 1px solid var(--line); background: #0b1018; color: var(--text); transition: transform .2s ease, border-color .2s ease, box-shadow .2s ease; }
+    .tweet-card:hover { transform: translateY(-2px); border-color: rgba(29,155,240,.5); box-shadow: 0 18px 48px rgba(0,0,0,.28); }
+    .tweet-avatar { width: 50px; height: 50px; border-radius: 50%; overflow: hidden; border: 1px solid rgba(255,255,255,.12); background: #16202f; }
+    .tweet-avatar img { width: 100%; height: 100%; display: block; object-fit: cover; }
+    .tweet-body { min-width: 0; }
+    .tweet-author { display: flex; align-items: center; gap: 7px; font-family: Inter, ui-sans-serif, sans-serif; }
+    .tweet-author strong { font-size: .98rem; }
+    .tweet-author span { color: #768499; font-size: .8rem; }
+    .tweet-author .x-mark { margin-left: auto; color: #f1f5f9; font-size: 1.1rem; }
+    .tweet-text { margin: 12px 0 19px; color: #e3e9f2; font-family: Inter, ui-sans-serif, sans-serif; font-size: 1rem; line-height: 1.62; white-space: pre-line; }
+    .tweet-stats { display: flex; flex-wrap: wrap; align-items: center; gap: 13px 24px; color: #748398; font-size: .74rem; }
+    .tweet-stats span { display: inline-flex; align-items: center; gap: 6px; }
+    .tweet-stats .tweet-link { margin-left: auto; color: #58b9f5; font-weight: 700; letter-spacing: .04em; }
 
     .refer-toolbar { margin-bottom: 14px; display: grid; grid-template-columns: 1fr auto; gap: 14px; align-items: center; }
     .search-wrap { position: relative; }
@@ -368,6 +385,11 @@
       .article-copy { padding: 24px 18px; }
       .post-card h3 { margin-top: 16px; font-size: 1.18rem; }
       .post-open { grid-column: 1 / -1; min-height: 52px; padding: 0 18px; flex-direction: row; border-left: 0; border-top: 1px solid var(--line); text-align: left; }
+      .tweet-card { padding: 18px; grid-template-columns: 42px minmax(0, 1fr); gap: 12px; }
+      .tweet-avatar { width: 42px; height: 42px; }
+      .tweet-text { font-size: .91rem; }
+      .tweet-stats { gap: 11px 16px; }
+      .tweet-stats .tweet-link { width: 100%; margin-left: 0; padding-top: 4px; }
       .result-count { text-align: left; }
       .card-actions { grid-template-columns: 1fr; }
       .disclosure { flex-direction: column; gap: 7px; }
@@ -430,18 +452,20 @@
       <div class="section-head"><span class="section-index">01 // WRITING</span><h2>我在写什么，<br><em>直接读原文。</em></h2></div>
       <p class="section-copy">这里展示我在 X 发布的长文章，以及公开互动较高的实用帖子。页面中的标题、文案和入口均直接来自原帖。</p>
       <div class="writing-head"><strong>3 篇 X 长文章 / Original articles</strong><a href="https://x.com/RayAlwaysDay1" target="_blank" rel="noreferrer">查看 X 主页 ↗</a></div>
-      <div class="post-grid">
+      <div class="post-grid" id="article-list">
         <a class="post-card" href="https://x.com/RayAlwaysDay1/status/2105860519420936211?s=20" target="_blank" rel="noreferrer"><span class="article-index"><small>X Article</small><b>01</b></span><span class="article-copy"><span class="post-meta"><span>@RayAlwaysDay1</span><span>汇丰 Pulse</span></span><h3>内地学生申请汇丰Pulse指南｜被拒5—10次后，催了20天终于下卡</h3></span><span class="post-open"><span>阅读原文</span><b>↗</b></span></a>
-        <a class="post-card" href="https://x.com/RayAlwaysDay1/status/2106398937439772987?s=20" target="_blank" rel="noreferrer"><span class="article-index"><small>X Article</small><b>02</b></span><span class="article-copy"><span class="post-meta"><span>@RayAlwaysDay1</span><span>信银 GBA</span></span><h3>内地学生申请信银GBA｜从失败被卡材料，到成功开户刷满奖励的真实经验</h3></span><span class="post-open"><span>阅读原文</span><b>↗</b></span></a>
-        <a class="post-card" href="https://x.com/RayAlwaysDay1/status/2105476872884924483?s=20" target="_blank" rel="noreferrer"><span class="article-index"><small>X Article</small><b>03</b></span><span class="article-copy"><span class="post-meta"><span>@RayAlwaysDay1</span><span>Pirate Ship</span></span><h3>PirateShip海盗船折扣打单 最低26刀转运回国 UPS官方3折 Anytime Mailbox低价转运回国</h3></span><span class="post-open"><span>阅读原文</span><b>↗</b></span></a>
+        <a class="post-card" hidden href="https://x.com/RayAlwaysDay1/status/2106398937439772987?s=20" target="_blank" rel="noreferrer"><span class="article-index"><small>X Article</small><b>02</b></span><span class="article-copy"><span class="post-meta"><span>@RayAlwaysDay1</span><span>信银 GBA</span></span><h3>内地学生申请信银GBA｜从失败被卡材料，到成功开户刷满奖励的真实经验</h3></span><span class="post-open"><span>阅读原文</span><b>↗</b></span></a>
+        <a class="post-card" hidden href="https://x.com/RayAlwaysDay1/status/2105476872884924483?s=20" target="_blank" rel="noreferrer"><span class="article-index"><small>X Article</small><b>03</b></span><span class="article-copy"><span class="post-meta"><span>@RayAlwaysDay1</span><span>Pirate Ship</span></span><h3>PirateShip海盗船折扣打单 最低26刀转运回国 UPS官方3折 Anytime Mailbox低价转运回国</h3></span><span class="post-open"><span>阅读原文</span><b>↗</b></span></a>
       </div>
+      <div class="pager-controls" id="article-pager" aria-label="长文章翻页"><button class="pager-button prev" type="button" aria-label="上一篇文章">←</button><span class="pager-status" aria-live="polite">01 / 03</span><button class="pager-button next" type="button" aria-label="下一篇文章">→</button></div>
       <div class="writing-head popular-head"><strong>4 条高赞帖子 / Popular posts</strong><span>公开数据读取于 2026.10.12</span></div>
-      <div class="post-grid">
-        <a class="post-card popular-post" href="https://x.com/RayAlwaysDay1/status/2109098959553896902?s=20" target="_blank" rel="noreferrer"><span class="article-index"><small>Popular Post</small><b>01</b></span><span class="article-copy"><span class="post-meta"><span>@RayAlwaysDay1</span><span>136 赞 · 1.2万浏览</span></span><h3>Hi 大家👋 我是Ray，00后云居民，主要分享港美卡、出海基建、券商与被动收入相关的真实折腾记录</h3></span><span class="post-open"><span>查看帖子</span><b>↗</b></span></a>
-        <a class="post-card popular-post" href="https://x.com/RayAlwaysDay1/status/2109281970056474712" target="_blank" rel="noreferrer"><span class="article-index"><small>Popular Post</small><b>02</b></span><span class="article-copy"><span class="post-meta"><span>@RayAlwaysDay1</span><span>30 赞 · 4825 浏览</span></span><h3>汇丰蓝狮子北上广深蓉地铁可享100%现金回赠</h3></span><span class="post-open"><span>查看帖子</span><b>↗</b></span></a>
-        <a class="post-card popular-post" href="https://x.com/RayAlwaysDay1/status/2107849812376981684?s=20" target="_blank" rel="noreferrer"><span class="article-index"><small>Popular Post</small><b>03</b></span><span class="article-copy"><span class="post-meta"><span>@RayAlwaysDay1</span><span>14 赞 · 3863 浏览</span></span><h3>美卡☁️居民返利平台推荐：Rakuten乐天</h3></span><span class="post-open"><span>查看帖子</span><b>↗</b></span></a>
-        <a class="post-card popular-post" href="https://x.com/RayAlwaysDay1/status/2107254450045981092?s=20" target="_blank" rel="noreferrer"><span class="article-index"><small>Popular Post</small><b>04</b></span><span class="article-copy"><span class="post-meta"><span>@RayAlwaysDay1</span><span>11 赞 · 5782 浏览</span></span><h3>CNID在线上申请汇丰香港账户，到港激活时，有如下没人告诉你的技巧</h3></span><span class="post-open"><span>查看帖子</span><b>↗</b></span></a>
+      <div class="tweet-list" id="popular-list">
+        <a class="tweet-card" href="https://x.com/RayAlwaysDay1/status/2109098959553896902?s=20" target="_blank" rel="noreferrer"><span class="tweet-avatar"><img src="avatar.jpg" alt="Ray 头像"></span><span class="tweet-body"><span class="tweet-author"><strong>Ray</strong><span>@RayAlwaysDay1</span><span class="x-mark">𝕏</span></span><span class="tweet-text">Hi 大家👋 我是Ray，00后云居民，主要分享港美卡、出海基建、券商与被动收入相关的真实折腾记录</span><span class="tweet-stats"><span>♡ 136</span><span>↻ 7</span><span>◉ 1.2万</span><span class="tweet-link">在 X 查看 ↗</span></span></span></a>
+        <a class="tweet-card" href="https://x.com/RayAlwaysDay1/status/2109281970056474712" target="_blank" rel="noreferrer"><span class="tweet-avatar"><img src="avatar.jpg" alt="Ray 头像"></span><span class="tweet-body"><span class="tweet-author"><strong>Ray</strong><span>@RayAlwaysDay1</span><span class="x-mark">𝕏</span></span><span class="tweet-text">汇丰蓝狮子北上广深蓉地铁可享100%现金回赠<br><br>‼️注意细节：需要先报名成功，上限25 RMB，蓝狮子 / Red / Premier 都可以参加。</span><span class="tweet-stats"><span>♡ 30</span><span>↻ 1</span><span>◉ 4825</span><span class="tweet-link">在 X 查看 ↗</span></span></span></a>
+        <a class="tweet-card" hidden href="https://x.com/RayAlwaysDay1/status/2107849812376981684?s=20" target="_blank" rel="noreferrer"><span class="tweet-avatar"><img src="avatar.jpg" alt="Ray 头像"></span><span class="tweet-body"><span class="tweet-author"><strong>Ray</strong><span>@RayAlwaysDay1</span><span class="x-mark">𝕏</span></span><span class="tweet-text">美卡☁️居民返利平台推荐：Rakuten乐天<br><br>注册难度低且收益丰厚，可以获得注册美卡的额外奖励。</span><span class="tweet-stats"><span>♡ 14</span><span>↻ 2</span><span>◉ 3863</span><span class="tweet-link">在 X 查看 ↗</span></span></span></a>
+        <a class="tweet-card" hidden href="https://x.com/RayAlwaysDay1/status/2107254450045981092?s=20" target="_blank" rel="noreferrer"><span class="tweet-avatar"><img src="avatar.jpg" alt="Ray 头像"></span><span class="tweet-body"><span class="tweet-author"><strong>Ray</strong><span>@RayAlwaysDay1</span><span class="x-mark">𝕏</span></span><span class="tweet-text">CNID在线上申请汇丰香港账户，到港激活时，有如下没人告诉你的技巧：<br><br>可以预申请卓越账户，而不是 One 账户，不用50w。</span><span class="tweet-stats"><span>♡ 11</span><span>↻ 0</span><span>◉ 5782</span><span class="tweet-link">在 X 查看 ↗</span></span></span></a>
       </div>
+      <div class="pager-controls" id="popular-pager" aria-label="热门帖子翻页"><button class="pager-button prev" type="button" aria-label="上一组帖子">←</button><span class="pager-status" aria-live="polite">01 / 02</span><button class="pager-button next" type="button" aria-label="下一组帖子">→</button></div>
     </section>
 
     <section id="refer" class="shell reveal">
@@ -508,6 +532,32 @@
   <footer class="shell"><span>© <span id="year"></span> RayAlwaysDay1</span><span>Build globally · Share honestly</span></footer>
 
   <script>
+    function setupPager(listId, pagerId, pageSize) {
+      const list = document.getElementById(listId);
+      const pager = document.getElementById(pagerId);
+      const items = [...list.children];
+      const previous = pager.querySelector('.prev');
+      const next = pager.querySelector('.next');
+      const status = pager.querySelector('.pager-status');
+      const pageCount = Math.ceil(items.length / pageSize);
+      let page = 0;
+
+      function renderPage() {
+        const start = page * pageSize;
+        items.forEach((item, index) => { item.hidden = index < start || index >= start + pageSize; });
+        previous.disabled = page === 0;
+        next.disabled = page === pageCount - 1;
+        status.textContent = String(page + 1).padStart(2, '0') + ' / ' + String(pageCount).padStart(2, '0');
+      }
+
+      previous.addEventListener('click', () => { if (page > 0) { page -= 1; renderPage(); } });
+      next.addEventListener('click', () => { if (page < pageCount - 1) { page += 1; renderPage(); } });
+      renderPage();
+    }
+
+    setupPager('article-list', 'article-pager', 1);
+    setupPager('popular-list', 'popular-pager', 2);
+
     // 每个项目独立维护 referUrl 与 tutorialUrl；两个入口互相独立，缺少时自动隐藏对应按钮。
     const referrals = [
       {
