@@ -541,7 +541,7 @@
         referUrl: 'https://ibkr.com/referral/ruixuan371', tutorialUrl: '', search: 'interactive brokers 券商 美股 股票 投资 trading brokerage'
       },
       {
-        id: 'charles-schwab', name: 'Charles Schwab', mark: 'SCHWAB', category: 'Broker', group: 'broker', region: 'US', logo: 'logos/charles-schwab.svg', logoClass: 'wordmark',
+        id: 'charles-schwab', name: 'Charles Schwab', mark: 'SCHWAB', category: 'Broker', group: 'broker', region: 'US', logo: 'https://content.schwab.com/apperror/logo.png',
         brandBg: '#f3f9fc', brandInk: '#0074a6', orbit: 'rgba(0,116,166,.18)',
         summary: '美国综合券商，Schwab One International 适合符合地区资格的非美国居民投资美股与 ETF。',
         reward: '没有邀请奖励；这张卡仅作为嘉信理财开户资料与 Ray 教程内容入口。',
@@ -581,7 +581,7 @@
         referUrl: 'https://h5.fotechwealth.com/pages/startAccount.html?channel=040003&aeCode=B2&invitationCode=ZBWMWX&langType=zhCn#/index', tutorialUrl: '', search: '复星 复星证券 fosun securities 香港 券商 港股 美股 股票 投资 brokerage'
       },
       {
-        id: 'hsbc-hk', name: 'HSBC Hong Kong', mark: '汇丰银行', category: 'Bank', group: 'bank', region: 'HK', logo: 'logos/hsbc.svg', logoClass: 'wordmark',
+        id: 'hsbc-hk', name: 'HSBC Hong Kong', mark: '汇丰银行', category: 'Bank', group: 'bank', region: 'HK', logo: 'https://www.hsbc.com.hk/content/dam/hsbc/hk/images/hongkong-hsbc-logo-en.svg', logoClass: 'wordmark',
         brandBg: '#ffffff', brandInk: '#db0011', orbit: 'rgba(219,0,17,.16)',
         summary: '香港大型银行，提供多币种账户、日常收付款、投资与跨境银行服务。',
         reward: '没有邀请奖励；这张卡仅作为汇丰香港开户信息与 Ray 开户教程入口。',
@@ -613,6 +613,16 @@
         referUrl: 'https://ship.pirateship.com/ship', tutorialUrl: 'https://x.com/RayAlwaysDay1/status/2105476872884924483?s=20', search: '寄件 物流 打单 shipping label usps ups 美国 转运'
       }
     ];
+
+    const featuredOrder = ['hsbc-hk', 'charles-schwab', 'wise', 'za-bank'];
+    referrals.sort((a, b) => {
+      const aIndex = featuredOrder.indexOf(a.id);
+      const bIndex = featuredOrder.indexOf(b.id);
+      if (aIndex === -1 && bIndex === -1) return 0;
+      if (aIndex === -1) return 1;
+      if (bIndex === -1) return -1;
+      return aIndex - bIndex;
+    });
 
     const grid = document.getElementById('refer-grid');
     const searchInput = document.getElementById('refer-search');
