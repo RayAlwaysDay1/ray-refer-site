@@ -70,7 +70,7 @@
       'equifax':[-340,840],'tu':[0,840],'ex':[340,840],
       'bad-address':[-850,600],'sofi':[1220,420],'rakuten':[1220,600],'kraken':[1220,780]
     };
-    state.vertical=wrap.getBoundingClientRect().width<720;
+    state.vertical=wrap.getBoundingClientRect().width<940;
     const fixed=state.vertical?vertical:horizontal;
     state.data.nodes.forEach((n,i)=>{const p=fixed[n.id]||[state.vertical?300:900,900+i*80];n.x=p[0];n.y=p[1];n.targetY=n.y;n.vx=0;n.vy=0;});
   }
@@ -96,9 +96,14 @@
   }
   function connected(id){const s=new Set([id]);state.edges.forEach(e=>{if(sourceId(e)===id)s.add(targetId(e));if(targetId(e)===id)s.add(sourceId(e));});return s}
 
-  function labelWidth(title){
-    const units=Array.from(title).reduce((sum,ch)=>sum+(ch.charCodeAt(0)>255?20:11.5),0);
-    return Math.max(250,Math.min(380,units+58));
+  function labelScreenWidth(title){
+    const units=Array.from(title).reduce((sum,ch)=>sum+(ch.charCodeAt(0)>255?14:7.7),0);
+    return Math.max(132,Math.min(270,units+38));
+  }
+  function sizeNode(n){
+    const scale=Math.max(.01,state.scale);
+    n._w=labelScreenWidth(n.title)/scale;
+    n._h=44/scale;
   }
 
   function traceEdge(a,b,e){
@@ -125,7 +130,7 @@
     ctx.clearRect(0,0,state.width,state.height);
     const focus=state.selected?connected(state.selected.id):null;
     ctx.save();ctx.translate(state.width/2+state.tx,state.height/2+state.ty);ctx.scale(state.scale,state.scale);
-    state.nodes.forEach(n=>{n._w=labelWidth(n.title);n._h=50;});
+    state.nodes.forEach(sizeNode);
     state.edges.forEach(e=>{
       const a=state.data.nodeMap.get(sourceId(e)),b=state.data.nodeMap.get(targetId(e));if(!a||!b)return;
       const directlySelected=!focus||((a.id===state.selected?.id||b.id===state.selected?.id));
@@ -144,7 +149,7 @@
       ctx.shadowColor=stageColor(n.stage);ctx.shadowBlur=(state.selected===n?22:state.hovered===n?12:0)/state.scale;
       roundedRect(n.x-w/2,n.y-h/2,w,h,9);ctx.fillStyle=isMain?'#203147':'#172131';ctx.fill();
       ctx.lineWidth=(state.selected===n?3.4:isMain?2.6:state.hovered===n?2:1.25)/state.scale;ctx.strokeStyle=stageColor(n.stage);ctx.stroke();ctx.shadowBlur=0;
-      ctx.fillStyle='#e7ecf3';ctx.font=`700 ${Math.max(11,13/state.scale)}px Inter, sans-serif`;ctx.textAlign='center';ctx.textBaseline='middle';ctx.fillText(n.title,n.x,n.y);
+      ctx.fillStyle='#e7ecf3';ctx.font=`700 ${13/state.scale}px Inter, sans-serif`;ctx.textAlign='center';ctx.textBaseline='middle';ctx.fillText(n.title,n.x,n.y);
       if(!isSecondary){ctx.fillStyle=stageColor(n.stage);ctx.fillRect(n.x-w/2,n.y-h/2,5/state.scale,h);}
     });
     ctx.restore();ctx.globalAlpha=1;
@@ -160,15 +165,22 @@
   canvas.addEventListener('dblclick',ev=>{const p=coords(ev),n=findNode(p.x,p.y);if(n)centerOn(n,true)});
   canvas.addEventListener('wheel',ev=>{ev.preventDefault();const p=coords(ev),before=screenToWorld(p.x,p.y),next=Math.max(.42,Math.min(2.2,state.scale*Math.exp(-ev.deltaY*.001)));state.scale=next;state.tx=p.x-state.width/2-before.x*next;state.ty=p.y-state.height/2-before.y*next;state.dirty=true},{passive:false});
 
-  function fit(){if(!state.nodes.length)return;state.nodes.forEach(n=>{n._w=labelWidth(n.title);n._h=50});const minX=Math.min(...state.nodes.map(n=>n.x-n._w/2)),maxX=Math.max(...state.nodes.map(n=>n.x+n._w/2)),minY=Math.min(...state.nodes.map(n=>n.y-n._h/2)),maxY=Math.max(...state.nodes.map(n=>n.y+n._h/2));const w=maxX-minX+140,h=maxY-minY+150;state.scale=Math.max(state.vertical?.26:.32,Math.min(1,Math.min(state.width/w,state.height/h)));state.tx=-(maxX+minX)/2*state.scale;state.ty=-(maxY+minY)/2*state.scale;state.dirty=true}
+  function fit(){if(!state.nodes.length)return;const minX=Math.min(...state.nodes.map(n=>n.x)),maxX=Math.max(...state.nodes.map(n=>n.x)),minY=Math.min(...state.nodes.map(n=>n.y)),maxY=Math.max(...state.nodes.map(n=>n.y));const widest=Math.max(...state.nodes.map(n=>labelScreenWidth(n.title))),spanX=Math.max(1,maxX-minX),spanY=Math.max(1,maxY-minY),scaleX=Math.max(.18,(state.width-widest-92)/spanX),scaleY=Math.max(.18,(state.height-44-128)/spanY);state.scale=Math.min(1,scaleX,scaleY);state.tx=-(maxX+minX)/2*state.scale;state.ty=-(maxY+minY)/2*state.scale;state.nodes.forEach(sizeNode);state.dirty=true}
   function centerOn(n,zoom=false){state.scale=zoom?Math.max(state.scale,1.15):state.scale;state.tx=-n.x*state.scale;state.ty=-n.y*state.scale;state.dirty=true}
 
   function relationSentence(e,other){const label=e.label?`：${e.label}`:'';const prefix={optional:'可选 · ',blocks:'风险 · ',monitors:'征信记录 · ',stacks:'可叠加 · '}[e.kind]||'';return `${prefix}${other.title}${label}`}
   function relationHTML(n,direction){const rows=state.data.edges.filter(e=>direction==='up'?targetId(e)===n.id:sourceId(e)===n.id);if(!rows.length)return'';return `<div class="relations"><h3>${direction==='up'?'为什么会连到这里':'从这里还能去哪里'}</h3><div class="rel-list">${rows.map(e=>{const id=direction==='up'?sourceId(e):targetId(e),other=state.data.nodeMap.get(id);return `<button class="rel-btn" type="button" data-node="${id}"><span>${esc(relationSentence(e,other))}</span><i aria-hidden="true">→</i></button>`}).join('')}</div></div>`}
-  function selectNode(n,push=true){state.selected=n;detail.classList.toggle('has-selection',!!n);if(n){document.querySelector('#side-note').textContent=n.stage==='side'?'非主路径 / OPTIONAL':'NODE DETAIL';document.querySelector('#detail-title').textContent=n.title;document.querySelector('#detail-tags').innerHTML=`<span class="tag stage" style="--stage:${stageColor(n.stage)}">${STAGES[n.stage][0]}</span>${(n.paths||[]).map(p=>`<span class="tag">${PATHS[p]}</span>`).join('')}`;const cardArt=n.cardImage?`<figure class="card-art"><div class="card-art-frame"><img src="${esc(n.cardImage)}" alt="${esc(n.cardImageAlt||`${n.title} 卡面`)}" loading="eager"></div><figcaption><span>Card Face · 卡面参考</span><span>${esc(n.cardImageCaption||n.title)}</span></figcaption></figure>`:'';document.querySelector('#detail-body').innerHTML=`${cardArt}${n.timing?`<div class="timing"><strong>建议时机</strong><br>${esc(n.timing)}</div>`:''}<p class="summary">${esc(n.summary)}</p><div class="copy">${n.body.map(p=>`<p>${esc(p)}</p>`).join('')}</div>${n.pitfalls?.length?`<div class="warning"><strong>注意</strong><ul>${n.pitfalls.map(p=>`<li>${esc(p)}</li>`).join('')}</ul></div>`:''}${relationHTML(n,'up')}${relationHTML(n,'down')}`;document.querySelectorAll('[data-node]').forEach(b=>b.onclick=()=>selectNode(state.data.nodeMap.get(b.dataset.node)));if(push){const u=new URL(location.href);u.searchParams.set('node',n.id);history.replaceState(null,'',u);}centerOn(n,false);}else if(push){const u=new URL(location.href);u.searchParams.delete('node');history.replaceState(null,'',u);}state.dirty=true}
+  function cardHTML(n){
+    const cards=n.cards||(n.cardImage?[{name:n.cardImageCaption||n.title,image:n.cardImage,alt:n.cardImageAlt}]:[]);
+    if(!cards.length)return'';
+    const gallery=`<div class="card-gallery">${cards.map(c=>`<figure class="card-art"><div class="card-art-frame"><img src="${esc(c.image)}" alt="${esc(c.alt||`${c.name} 卡面`)}" loading="eager"></div><figcaption><span>Card Face · 卡面参考</span><span>${esc(c.name)}</span></figcaption></figure>`).join('')}</div>`;
+    const applications=`<section class="application"><h3>申请信息</h3><div class="application-list">${cards.map(c=>`<article class="application-card"><strong>${esc(c.name)}</strong><dl>${c.issuer?`<div><dt>发行方</dt><dd>${esc(c.issuer)}</dd></div>`:''}${c.annualFee?`<div><dt>年费</dt><dd>${esc(c.annualFee)}</dd></div>`:''}${c.eligibility?`<div><dt>建议条件</dt><dd>${esc(c.eligibility)}</dd></div>`:''}</dl>${c.note?`<p>${esc(c.note)}</p>`:''}${c.applyUrl?`<a href="${esc(c.applyUrl)}" target="_blank" rel="noreferrer">查看官网 / Apply ↗</a>`:''}</article>`).join('')}</div><small>年费、奖励和审核口径可能变化，提交申请前请再次核对官网条款。</small></section>`;
+    return gallery+applications;
+  }
+  function selectNode(n,push=true){state.selected=n;detail.classList.toggle('has-selection',!!n);if(n){document.querySelector('#side-note').textContent=n.stage==='side'?'非主路径 / OPTIONAL':'NODE DETAIL';document.querySelector('#detail-title').textContent=n.title;document.querySelector('#detail-tags').innerHTML=`<span class="tag stage" style="--stage:${stageColor(n.stage)}">${STAGES[n.stage][0]}</span>${(n.paths||[]).map(p=>`<span class="tag">${PATHS[p]}</span>`).join('')}`;document.querySelector('#detail-body').innerHTML=`${cardHTML(n)}${n.timing?`<div class="timing"><strong>建议时机</strong><br>${esc(n.timing)}</div>`:''}<p class="summary">${esc(n.summary)}</p><div class="copy">${n.body.map(p=>`<p>${esc(p)}</p>`).join('')}</div>${n.pitfalls?.length?`<div class="warning"><strong>注意</strong><ul>${n.pitfalls.map(p=>`<li>${esc(p)}</li>`).join('')}</ul></div>`:''}${relationHTML(n,'up')}${relationHTML(n,'down')}`;document.querySelectorAll('[data-node]').forEach(b=>b.onclick=()=>selectNode(state.data.nodeMap.get(b.dataset.node)));if(push){const u=new URL(location.href);u.searchParams.set('node',n.id);history.replaceState(null,'',u);}centerOn(n,false);}else if(push){const u=new URL(location.href);u.searchParams.delete('node');history.replaceState(null,'',u);}state.dirty=true}
 
   function setupSearch(){const input=document.querySelector('#search');input.addEventListener('input',()=>{const q=input.value.trim().toLowerCase();state.nodes.forEach(n=>n._match=!q||[n.title,...(n.aliases||[])].join(' ').toLowerCase().includes(q));const first=state.nodes.find(n=>n._match);if(q&&first){state.hovered=first;centerOn(first,false)}state.dirty=true});input.addEventListener('keydown',e=>{if(e.key==='Enter'){const q=input.value.trim().toLowerCase(),n=state.data.nodes.find(n=>[n.title,...(n.aliases||[])].join(' ').toLowerCase().includes(q));if(n){if(!state.nodes.includes(n)){state.showAll=true;document.querySelector('#show-all').setAttribute('aria-pressed','true');document.querySelector('#show-all').textContent='收起旁路节点';applyFilters(true)}selectNode(n);}}});addEventListener('keydown',e=>{if(e.key==='/'&&!/input|textarea/i.test(document.activeElement.tagName)){e.preventDefault();input.focus()}if(e.key==='Escape'){input.value='';state.nodes.forEach(n=>n._match=true);state.hovered=null;selectNode(null);}})}
 
-  async function init(){initControls();setupSearch();try{const data=await fetch('graph.json?v=20261011-aligned-relations').then(r=>{if(!r.ok)throw Error('graph');return r.json()});data.nodeMap=new Map(data.nodes.map(n=>[n.id,n]));state.data=data;seedPositions();applyFilters();resize();fit();draw();const id=new URLSearchParams(location.search).get('node');if(id&&data.nodeMap.has(id)){const n=data.nodeMap.get(id);if(!state.nodes.includes(n)){state.showAll=true;document.querySelector('#show-all').setAttribute('aria-pressed','true');document.querySelector('#show-all').textContent='收起旁路节点';applyFilters(true)}selectNode(n,false)}new ResizeObserver(()=>{const wasVertical=state.vertical;resize();if(wasVertical!==(wrap.getBoundingClientRect().width<720))seedPositions();fit();draw();}).observe(wrap);setInterval(frame,33);}catch(err){document.querySelector('#graph-status').textContent='图谱载入失败，请刷新重试';console.error(err)}}
+  async function init(){initControls();setupSearch();try{const data=await fetch('graph.json?v=20261011-card-details').then(r=>{if(!r.ok)throw Error('graph');return r.json()});data.nodeMap=new Map(data.nodes.map(n=>[n.id,n]));state.data=data;seedPositions();applyFilters();resize();fit();draw();const id=new URLSearchParams(location.search).get('node');if(id&&data.nodeMap.has(id)){const n=data.nodeMap.get(id);if(!state.nodes.includes(n)){state.showAll=true;document.querySelector('#show-all').setAttribute('aria-pressed','true');document.querySelector('#show-all').textContent='收起旁路节点';applyFilters(true)}selectNode(n,false)}new ResizeObserver(()=>{const wasVertical=state.vertical;resize();if(wasVertical!==(wrap.getBoundingClientRect().width<940))seedPositions();fit();draw();}).observe(wrap);setInterval(frame,33);}catch(err){document.querySelector('#graph-status').textContent='图谱载入失败，请刷新重试';console.error(err)}}
   init();
 })();
