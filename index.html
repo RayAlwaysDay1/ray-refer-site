@@ -473,7 +473,7 @@
       <p class="section-copy">通信、跨境金融、信用卡与返利平台。你可以参考这些信息开户，也可以打开 Ray 的具体教程；部分项目提供邀请链接，部分仅提供教程入口。</p>
       <div class="refer-toolbar">
         <label class="search-wrap"><span class="search-icon" aria-hidden="true">⌕</span><span class="sr-only">搜索推荐</span><input class="search-input" id="refer-search" type="search" autocomplete="off" placeholder="搜索品牌、类别、地区或教程…"></label>
-        <div class="result-count" aria-live="polite">找到 <b id="result-count">20</b> 个项目</div>
+        <div class="result-count" aria-live="polite">找到 <b id="result-count">21</b> 个项目</div>
       </div>
       <div class="category-filters" role="group" aria-label="推荐分类">
         <span class="filter-label">快速分类</span>
@@ -706,6 +706,14 @@
         referUrl: 'https://py.pl/1ONLKJ', tutorialUrl: '', search: '支付 钱包 payment wallet paypal 美国'
       },
       {
+        id: 'majority', name: 'MAJORITY', mark: 'MAJORITY', category: 'Banking', group: 'bank', region: 'US',
+        brandBg: '#f6ff3c', brandInk: '#111111', orbit: 'rgba(246,255,60,.24)',
+        summary: '面向美国移民社区的金融会员服务，涵盖合作银行账户、Visa 借记卡、跨境汇款、国际通话与手机充值；MAJORITY 本身不是银行。',
+        reward: '邀请人与受邀人的奖励金额以 MAJORITY App 实时显示为准；官方可能随时调整活动金额。',
+        conditions: '受邀人需完成身份验证，在注册后 30 天内入金至少 $20，并使用 MAJORITY 借记卡完成 3 笔单笔超过 $5 的合资格消费；用卡任务需 Plus 计划。官方仅允许向亲友私下分享邀请链接。',
+        referUrl: '', contactUrl: 'https://x.com/RayAlwaysDay1', primaryLabel: '私信获取邀请', primaryLabelEn: 'Message on X', stateLabel: 'Contact Ray', tutorialUrl: '', search: 'majority 美国 银行账户 借记卡 visa 移民 跨境汇款 国际通话 手机充值 banking debit card remittance'
+      },
+      {
         id: 'anytime-mailbox', name: 'Anytime Mailbox', mark: 'ANYTIME MAILBOX', category: 'Virtual Mailbox', group: 'other', region: 'US',
         brandBg: '#141b24', brandInk: '#f5b942', orbit: 'rgba(245,185,66,.22)',
         summary: '面向跨境用户的虚拟邮箱服务，可在线查看来信，并按需选择扫描、转寄、销毁或到店领取。',
@@ -742,13 +750,16 @@
 
     function renderCard(item) {
       const hasApplication = Boolean(item.referUrl);
+      const hasContact = Boolean(item.contactUrl);
+      const primaryActionUrl = item.referUrl || item.contactUrl || '';
+      const hasPrimaryAction = Boolean(primaryActionUrl);
       const hasTutorial = Boolean(item.tutorialUrl);
-      const available = hasApplication || hasTutorial;
+      const available = hasPrimaryAction || hasTutorial;
       const logo = item.logo
         ? '<img class="brand-logo" src="' + item.logo + '" alt="' + item.name + ' Logo"><span class="logo-fallback">' + (item.mark || item.name) + '</span>'
         : '<span class="logo-fallback">' + (item.mark || item.name) + '</span>';
-      const applyAction = hasApplication
-        ? '<a class="action-button primary-action" href="' + item.referUrl + '" target="_blank" rel="noreferrer sponsored">前往申请<small>Apply Now</small></a>'
+      const applyAction = hasPrimaryAction
+        ? '<a class="action-button primary-action" href="' + primaryActionUrl + '" target="_blank" rel="noreferrer' + (hasApplication ? ' sponsored' : '') + '">' + (item.primaryLabel || '前往申请') + '<small>' + (item.primaryLabelEn || 'Apply Now') + '</small></a>'
         : '';
       const guideAction = hasTutorial
         ? '<a class="action-button guide-action" href="' + item.tutorialUrl + '" target="_blank" rel="noreferrer">查看教程<small>View Guide</small></a>'
@@ -761,7 +772,7 @@
         '<button class="card-toggle" type="button" aria-expanded="false" aria-controls="details-' + item.id + '">' +
           '<span class="logo-box ' + (item.logoClass || '') + '" style="--brand-bg:' + item.brandBg + ';--brand-ink:' + item.brandInk + ';--orbit:' + item.orbit + '">' + logo + '</span>' +
           '<span class="card-preview">' +
-            '<span class="meta"><span>' + item.category + ' / ' + item.region + '</span><span class="state">' + (hasApplication ? 'Link ready' : hasTutorial ? 'Guide ready' : 'Pending') + '</span></span>' +
+            '<span class="meta"><span>' + item.category + ' / ' + item.region + '</span><span class="state">' + (item.stateLabel || (hasApplication ? 'Link ready' : hasContact ? 'Contact Ray' : hasTutorial ? 'Guide ready' : 'Pending')) + '</span></span>' +
             '<span class="card-title-row"><h3>' + item.name + '</h3><span class="expand-mark" aria-hidden="true">＋</span></span>' +
             '<span class="summary">' + item.summary + '</span>' +
             '<span class="tap-hint"><span>点击展开详情</span><span>Details</span></span>' +
